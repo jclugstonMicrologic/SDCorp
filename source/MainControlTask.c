@@ -70,65 +70,32 @@ BOOL MainControlTaskInit( void )
 
 /*
 *|----------------------------------------------------------------------------
-*|  Routine: Solenoid_Toggle_Timer_Callback
+*|  Routine: Led_Toggle_Timer_Callback
 *|  Description:
 *|  Retval:
 *|----------------------------------------------------------------------------
 */
-static void Solenoid_Toggle_Timer_Callback (void * pvParameter)
-{        
-    static UINT8 solenoidState =0;
-    int j =0;
-    
-    if( solenoidState ==0 )
-    {
-        for(j=1; j<8; j++)
-        {
-            OpenValve(j);          
-            TimerDelayUs(1000);
-        }        
-        
-        for(j=1; j<5; j++)
-        {
-            OpenReliefValve(j);
-        }
-        
-        SciAsciiSendString(SCI_PC_COM, "OPEN\r\n");
-        
-        solenoidState =1;
-    }
-    else
-    {
-        for(j=1; j<8; j++)
-        {
-            CloseValve(j);          
-            TimerDelayUs(1000);
-        }   
-        for(j=1; j<5; j++)
-        {
-            CloseReliefValve(j);
-        }        
-        
-        SciAsciiSendString(SCI_PC_COM, "CLOSE\r\n");
-        
-        solenoidState =0;      
-    }
+static void Led_Toggle_Timer_Callback (void * pvParameter)
+{          
+    LED1_TOGGLE;
 }
 
 /*
 *|----------------------------------------------------------------------------
-*|  Routine: Solenoid_StartPeriodicToggle
+*|  Routine: LedFlash_StartPeriodicToggle
 *|  Description:
 *|  Retval:
 *|----------------------------------------------------------------------------
 */
-void Solenoid_StartPeriodicToggle(void)
+void LedFlash_StartPeriodicToggle(void)
 {
-    #define TIMER_PERIOD      2000          /**< Timer period (msec) */
+    #define TIMER_PERIOD      250          /**< Timer period (msec) */
     /* Start timer for LED1 blinking */
     TimerHandle_t read_timer_handle; 
-    read_timer_handle =xTimerCreate( "TdrRead", TIMER_PERIOD, pdTRUE, NULL, Solenoid_Toggle_Timer_Callback);
+    read_timer_handle =xTimerCreate( "led", TIMER_PERIOD, pdTRUE, NULL, Led_Toggle_Timer_Callback);
     xTimerStart(read_timer_handle, 0);
+    
+    //TimerCreate(250, Led_Toggle_Timer_Callback);
 }
 
 /*
@@ -149,16 +116,11 @@ void MainControlTask(void * pvParameters)
 UINT32 loopCnt =0;
 char aStr[32];
 
-#ifdef DEV_BOARD
-UINT8 valveState =0;
-UINT8 debounceCnt =0;
-#endif
-
-  //  TickType_t delayTime = xTaskGetTickCount();    
+    //TickType_t delayTime = xTaskGetTickCount();    
    
     /* !!! test !!! */
     strcpy(aStr, "TCE v");
-    strcat(aStr, TEC_FW_VERSION);
+    strcat(aStr, TCE_FW_VERSION);
     strcat(aStr, __DATE__);
     strcat(aStr, "\r\n\r\n");
      
@@ -166,16 +128,16 @@ UINT8 debounceCnt =0;
        
 #endif    
    
-  //  Solenoid_StartPeriodicToggle();
+    LedFlash_StartPeriodicToggle();
    
     /* get our board id now */
-    GpioGetBoardId();
+    //GpioGetBoardId();
     
     for( ;; )
     {      
         KickWdt();         
               
-   //     AdcMeasureReadings();
+        //AdcMeasureReadings();
 
 #ifdef TERMINAL_ENABLED        
         if( (++loopCnt %100) ==0 )
@@ -250,7 +212,7 @@ UINT8 debounceCnt =0;
          
         if( (loopCnt %1000 ) ==0 )
         {
-          SciAsciiSendString(SCI_PC_COM, "BLADDER OVER PRESSURE!!!\r\n");
+            SciAsciiSendString(SCI_PC_COM, "BLADDER OVER PRESSURE!!!\r\n");
         }
         
         /* place this task in the blocked state until it is time to run again */

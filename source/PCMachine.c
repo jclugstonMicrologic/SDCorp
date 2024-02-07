@@ -95,7 +95,7 @@ void PCProcessCommands
             NVIC_SystemReset();
             break;
         case CMD_GW_GET_FW_VERSION:
-            strcpy(SerialTxBuffer, TEC_FW_VERSION);
+            strcpy(SerialTxBuffer, TCE_FW_VERSION);
             strcat(SerialTxBuffer, __DATE__);
          //   strcat(SerialTxBuffer, __TIME__);
             
@@ -163,8 +163,7 @@ void PCProcessCommands
         case CMD_GET_PRESS:          
             break;            
         case CMD_GET_BRD_ID:
-            boardId =BOARD_ID;
-
+            //boardId =BOARD_ID;
             memcpy(SerialTxBuffer, &boardId, sizeof(boardId));            
             nbrTxBytes =sizeof(boardId);                
             break;

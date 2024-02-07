@@ -11,7 +11,7 @@
 * REVISION LOG
 *
 *******************************************************************************
-* Copyright (c) 2023, MICROLOGIC
+* Copyright (c) 2024, MICROLOGIC
 * Calgary, Alberta, Canada, www.micrologic.ab.ca
 *******************************************************************************/
 

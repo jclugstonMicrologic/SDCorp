@@ -184,7 +184,8 @@ void spiStart(UINT8 periph)
         case SPI_PERIPHERAL1:
             /* assert cs */
             ASSERT_SPI_PERIPH1_CS;
-            break;              
+            break;          
+#if 0            
         case SPI_PERIPHERAL2:
             /* assert cs */
             ASSERT_SPI_PERIPH2_CS;
@@ -214,6 +215,7 @@ void spiStart(UINT8 periph)
             /* assert cs */
             ASSERT_SPI_PERIPH8_CS;
             break;             
+#endif            
     }
     
     TimerDelayUs(10);
@@ -235,7 +237,8 @@ void spiStop(UINT8 periph)
         case SPI_PERIPHERAL1:
             /* negate cs */
             NEGATE_SPI_PERIPH1_CS;
-            break;                    
+            break;       
+#if 0            
         case SPI_PERIPHERAL2:
             /* negate cs */
             NEGATE_SPI_PERIPH2_CS;
@@ -263,7 +266,8 @@ void spiStop(UINT8 periph)
         case SPI_PERIPHERAL8:
             /* neagte cs */
             NEGATE_SPI_PERIPH8_CS;
-            break;                        
+            break;
+#endif
     }
     
     TimerDelayUs(10);  
