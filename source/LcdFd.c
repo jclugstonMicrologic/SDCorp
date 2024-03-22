@@ -93,12 +93,12 @@ void Lcd_Init( void )
     spiStart(0);
     
     lcdCommand(0x38+3); //function set european chararacter set
-    lcdCommand(0x08);  //display off
-    lcdCommand(0x06);  //entry mode set increment cursor by 1 not shifting display
-    lcdCommand(0x17);  //Character mode and internel power on (have to turn on internel power to get the best brightness)
-    lcdCommand(0x01);  //clear display
-    lcdCommand(0x02);  //return home
-    lcdCommand(0x0c);  //display on
+    lcdCommand(0x08);   //display off
+    lcdCommand(0x06);   //entry mode set increment cursor by 1 not shifting display
+    lcdCommand(0x17);   //Character mode and internel power on (have to turn on internel power to get the best brightness)
+    lcdCommand(0x01);   //clear display
+    lcdCommand(0x02);   //return home
+    lcdCommand(0x0c);   //display on
     
     /* clear display */    
     lcdCommand(0x01);

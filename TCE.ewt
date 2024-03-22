@@ -2390,6 +2390,12 @@
             <name>$PROJ_DIR$\source\gpioHi.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\source\KeypadFd.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\source\LcdFd.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\source\main.c</name>
         </file>
         <file>
@@ -2424,6 +2430,9 @@
         </file>
         <file>
             <name>$PROJ_DIR$\source\stm32f4xx_it.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\source\switchFd.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\source\sysTimers.c</name>

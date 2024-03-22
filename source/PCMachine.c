@@ -32,7 +32,6 @@
 #include "dataFlashFd.h"
 #include "AmcConfig.h"
 #include "LogMachine.h"
-#include "solenoidHi.h"
 
 #include "MainControlTask.h"
 

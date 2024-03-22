@@ -36,6 +36,8 @@
 #include "AdcFd.h"
 #include "crc.h"
 
+#include "LcdFd.h"
+
 #include "PCMachine.h"
 #include "MainControlTask.h"
 #include "PowerManagement.h"
@@ -181,13 +183,15 @@ BOOL TargetHardwareInit(void)
     /* initialize all GPIO */
     Gpio_Init();
           
-    Pwm_Init();
+    //Pwm_Init();
      
     /* initialize internal RTC */
-    RtcInit();
+    //RtcInit();
     
-    RtcInit();       
+    //RtcInit();       
 
+    Lcd_Init();
+    
     /* initialize hardware crc */
     //CrcInit32();
       

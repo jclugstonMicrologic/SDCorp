@@ -1,7 +1,7 @@
 /*
 *|***************************************************************************
-*|PROJECT:  Compact Compressor CCU
-*|Module:   KeypadFd
+*|PROJECT:  
+*|Module:   LcdFd
 *|   NOTES:
 *|**************************************************************************
 */
@@ -20,7 +20,7 @@ Tools:
 
 /*
    ***************************************************************************
-   Copyright (C) 2000, Micrologic Limited.
+   Copyright (C) 2024, Micrologic Limited.
    Any information contained in this document which was hitherto unknown by
    the recipient or in which there subsists a proprietary right must not be
    disclosed to any other person, nor used for manufacturing purposes,
@@ -83,6 +83,6 @@ Tools:
 *****************************************************************************
 */
 void Lcd_Init( void );
-
+void Lcd_SendString(uint8_t row, char *pBuf);
 #endif
 

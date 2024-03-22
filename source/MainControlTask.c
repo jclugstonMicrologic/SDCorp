@@ -11,14 +11,13 @@
 * REVISION LOG
 *
 *******************************************************************************
-* Copyright (c) 2020, MICROLOGIC
+* Copyright (c) 2024, MICROLOGIC
 * Calgary, Alberta, Canada, www.micrologic.ab.ca
 *******************************************************************************/
 
 
 /** Include Files *************************************************************/
 #include "MainControlTask.h"
-#include "PowerManagement.h"
 #include "FreeRTOS.h"
 #include "timers.h"
 
@@ -28,6 +27,10 @@
 
 #include "wdtHi.h"
 #include "gpioHi.h"
+
+#include "SwitchFd.h"
+#include "KeypadFd.h"
+#include "LcdFd.h"
 
 #include "sysTimers.h"
 
@@ -124,14 +127,12 @@ char aStr[32];
     strcat(aStr, __DATE__);
     strcat(aStr, "\r\n\r\n");
      
-    SciAsciiSendString(SCI_PC_COM, aStr);
-       
+    SciAsciiSendString(SCI_PC_COM, aStr);       
 #endif    
    
     LedFlash_StartPeriodicToggle();
    
-    /* get our board id now */
-    //GpioGetBoardId();
+    Lcd_SendString(1, "HELLO");
     
     for( ;; )
     {      
@@ -139,81 +140,25 @@ char aStr[32];
               
         //AdcMeasureReadings();
 
-#ifdef TERMINAL_ENABLED        
+    #ifdef TERMINAL_ENABLED        
         if( (++loopCnt %100) ==0 )
         {
-        }
-                
-    #ifdef DEV_BOARD
-        if( valveState == 0)
-        {
-            debounceCnt =0;
-            
-            while( !GPIO_ReadInputDataBit(USER_BTN_PORT, USER_BTN_PIN) )
-            {
-                if( debounceCnt ++ >50 )
-                {                
-                    OpenValve(1);      
-                    valveState =1;
-                    break;
-                }                
-                TimerDelayUs(1000);
-            }                    
-        }
-        else if( valveState == 1)
-        {
-            debounceCnt =0;
-            
-            while( GPIO_ReadInputDataBit(USER_BTN_PORT, USER_BTN_PIN) )
-            {
-                if( debounceCnt ++ >50 )
-                {                
-                    valveState =2;
-                    break;
-                }                
-                TimerDelayUs(1000);
-            }
-        }
-        else if( valveState == 2)
-        {
-            debounceCnt =0;
-           
-            while( !GPIO_ReadInputDataBit(USER_BTN_PORT, USER_BTN_PIN) )
-            {
-                if( debounceCnt ++ >50 )
-                {
-                    CloseValve(1); 
-                    valveState =3;
-                    break;
-                }
-                TimerDelayUs(1000);
-            }
-        }                
-        else if( valveState ==3)
-        {
-            debounceCnt =0;
-            
-            while( GPIO_ReadInputDataBit(USER_BTN_PORT, USER_BTN_PIN) )
-            {
-                if( debounceCnt ++ >50 )
-                {
-                    valveState =0;
-                    break;
-                }
-                TimerDelayUs(1000);
-            }
-        }               
+            memset(&aStr, 0x00,sizeof(aStr));
+            sprintf(aStr, "count: %d\r\n", loopCnt);
+            SciAsciiSendString(SCI_PC_COM, aStr);
+        }                      
     #endif
-        
-#endif
         
         /* this delay allows lower priorty tasks to run */
         //vTaskDelay(1);
-         
-        if( (loopCnt %1000 ) ==0 )
-        {
-            SciAsciiSendString(SCI_PC_COM, "BLADDER OVER PRESSURE!!!\r\n");
-        }
+                       
+        for(int j=0; j<MAX_NUM_SWITCHES; j++)
+        { 
+            // debounce the switch input
+            SwitchMachine(j);
+        }        
+        
+        KeypadMachine(KeyActionRequest);
         
         /* place this task in the blocked state until it is time to run again */
         vTaskDelayUntil( &xNextWakeTime, 1 );        
