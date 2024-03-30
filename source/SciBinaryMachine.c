@@ -114,8 +114,8 @@ BOOL SciBinaryReceiverInit
             pSerialData =&PcDataCom;
             pSerialData->pCheckSumFunction =CrcCalc16;
             break;
-         case SCI_BLUETOOTH_COM:
-            pSerialData =&BleDataCom;
+         case SCI_RADIO_COM:
+            pSerialData =NULL;
             pSerialData->pCheckSumFunction =CrcCalc16;
             break;            
     }    
@@ -130,6 +130,8 @@ BOOL SciBinaryReceiverInit
     /* initialize sciPort serial port */
     SciSerialPortInit( (COMTypeDef)sciPort, baudRate, parity );
    
+    SciBinaryStartReceiver();
+    
     return TRUE;
 }
 
@@ -148,10 +150,8 @@ void SciBinaryTaskComx(void * pvParameters)
 //char SerialTxBuffer[16];
 
     for( ;; )
-    {        
-        SciBinaryRxMachine(&PcDataCom, SCI_PC_COM);
-        
-        SciBinaryRxMachine(&BleDataCom, SCI_BLUETOOTH_COM);
+    {                        
+        SciBinaryRxMachine(&BleDataCom, SCI_RADIO_COM);
         
         /* place this task in the blocked state until it is time to run again */
         vTaskDelayUntil( &xNextWakeTime, 1 );         

@@ -37,8 +37,9 @@
 #include "crc.h"
 
 #include "LcdFd.h"
+#include "KeypadFd.h"
 
-#include "PCMachine.h"
+#include "RadioMachine.h"
 #include "MainControlTask.h"
 #include "PowerManagement.h"
 
@@ -192,6 +193,7 @@ BOOL TargetHardwareInit(void)
 
     Lcd_Init();
     
+    Keypad_Init();
     /* initialize hardware crc */
     //CrcInit32();
       
@@ -220,20 +222,17 @@ BOOL TargetHardwareInit(void)
 */
 BOOL TceTasksInit(void)
 {   
-#ifdef PC_ENABLED      
-    /* initialize PC serial comm port */    
-    if( !PCMachineInit() )
+    if( !Radio_MachineInit() )
     {
         //!!!
         return FALSE;      
     }
-#endif
                  
     /* initialize the main control task */
     MainControlTaskInit();  
 
     /* start serial receiver task for proprietary serial comms (PC GUI) */
-    SciBinaryStartReceiver();
+    //SciBinaryStartReceiver();
     
     /* start serial receiver task for ASCII serial comms (Bluetooth) */
     //SciAsciiStartReceiver();

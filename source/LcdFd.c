@@ -81,17 +81,13 @@ void lcdSetPosition(uint8_t pos);
 */
 void Lcd_Init( void )
 {
-    //UINT8 regData =0;
-    //UINT8 chipId =0;      
-    //regData =12;
+    OLED_NEGATE_RST;
     
     SpiInit(LCD_SPI_PORT);    
        
     SpiDeviceInit(0);
     
-    /* assert cs */
-    spiStart(0);
-    
+#if 0
     lcdCommand(0x38+3); //function set european chararacter set
     lcdCommand(0x08);   //display off
     lcdCommand(0x06);   //entry mode set increment cursor by 1 not shifting display
@@ -106,15 +102,25 @@ void Lcd_Init( void )
       
     /* display OnOff */
     lcdCommand(0x08 | (DISPLAY_ON | CURSOR_ON | BLINK_ON) );
-      
-    /* negate cs */
-    spiStop(0);    
+#else
+    lcdCommand(0x3A); //FunctionSet: N=1 BE=0 RE=1 IS=0
+    lcdCommand(0x09); //4-line mode
+    lcdCommand(0x05); //View 0°
+    lcdCommand(0x38); //FunctionSet: N=1 DH=0 RE=0 IS=0
+    lcdCommand(0x3A); //FunctionSet: N=1 BE=0 RE=1 IS=0
+    lcdCommand(0x72); //ROM Selection (RE muss 1 sein)
+    lcdData(0x00);    //ROM_A = 0x00, ROM_B = 0x04, ROM_C = 0x0C
+    lcdCommand(0x38); //FunctionSet: N=1 DH=0 RE=0 IS=0
+    //lcdCommand(0x0D); //Display blink cursor on
+    lcdCommand(0x08 | (DISPLAY_ON | BLINK_ON) );
+    lcdCommand(0x01); //Clear display
+#endif
 }
 
 
 /*
 *|----------------------------------------------------------------------------
-*|  Routine: Lcd_Send
+*|  Routine: Lcd_SetCursor
 *|  Description:
 *|  Arguments:
 *|  Retval:
@@ -124,6 +130,8 @@ void Lcd_SetCursor(uint8_t pos)
 {
     lcdCommand(LCD_HOME_L1+pos);        
 }
+
+
 
 /*
 *|----------------------------------------------------------------------------
@@ -185,9 +193,10 @@ void lcdCommand(unsigned char cmd)
     
     /* assert cs */
     spiStart(0);
-    
-    SPI_TRANSFER_LCD(0x00);
-    SPI_TRANSFER_LCD(cmd);
+   
+    SPI_TRANSFER_LCD(0x1f);
+    SPI_TRANSFER_LCD( (cmd&0x0f) );
+    SPI_TRANSFER_LCD( (cmd>>4)&0x0f );
     
     /* negate cs */
     spiStop(0);    
@@ -200,9 +209,9 @@ void lcdData(unsigned char data)
     /* assert cs */
     spiStart(0);
     
-    SPI_TRANSFER_LCD(0x02); 
-    SPI_TRANSFER_LCD(data);
-    
+    SPI_TRANSFER_LCD(0x5f); 
+    SPI_TRANSFER_LCD( (data&0x0f));
+    SPI_TRANSFER_LCD((data>>4)&0x0f);
     /* negate cs */
     spiStop(0);    
 }

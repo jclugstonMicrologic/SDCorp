@@ -1,6 +1,6 @@
 /*
 *|***************************************************************************
-*|PROJECT:  Compact Compressor CCU
+*|PROJECT:  
 *|Module:   KeypadFd
 *|   NOTES:
 *|**************************************************************************
@@ -20,7 +20,7 @@ Tools:
 
 /*
    ***************************************************************************
-   Copyright (C) 2000, Micrologic Limited.
+   Copyright (C) 2024, Micrologic Limited.
    Any information contained in this document which was hitherto unknown by
    the recipient or in which there subsists a proprietary right must not be
    disclosed to any other person, nor used for manufacturing purposes,
@@ -69,15 +69,7 @@ extern INT8 LcdSelection;
 */
 
 
-/*
-*|----------------------------------------------------------------------------
-*|  Module: KeypadFd Module
-*|  Routine: InitKeypad
-*|  Description:
-*|   Defines the characteristics for each switch.
-*|----------------------------------------------------------------------------
-*/
-void InitKeypad
+void Keypad_Init
 (
    void
 );
@@ -94,6 +86,11 @@ void KeyFwdLow(void);
 void KeyFwdMed(void);
 void KeyFwdFast(void);
 void KeyFwdJog(void);
+
+void KeyRevLow(void);
+void KeyRevMed(void);
+void KeyRevFast(void);
+void KeyRevJog(void);
 
 enum
 {
@@ -112,11 +109,15 @@ enum
    KEY_FWD_MED,      
    KEY_FWD_FAST,  
    KEY_FWD_JOG,   
+   
+   KEY_REV_LOW,
+   KEY_REV_MED,      
+   KEY_REV_FAST,  
+   KEY_REV_JOG,      
 
    KEY_HELD_UP,
    KEY_HELD_DOWN,
      
-   KEY_UPDATE_SCREEN,
    KEY_VIRTUAL,
      
    KEY_NONE,

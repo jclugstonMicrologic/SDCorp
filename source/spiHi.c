@@ -120,7 +120,7 @@ void SpiDeviceInit(UINT8 periph)
 
     SPI_InitStructure.SPI_Direction =SPI_Direction_2Lines_FullDuplex;
     SPI_InitStructure.SPI_DataSize =SPI_DataSize_8b;
-    SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
+    SPI_InitStructure.SPI_FirstBit =SPI_FirstBit_LSB;
     SPI_InitStructure.SPI_TIMode  = 0;
     SPI_InitStructure.SPI_CRCPolynomial = 7;
     SPI_InitStructure.SPI_CRCCalculation = 0; /* disabled */
@@ -146,7 +146,7 @@ void SpiDeviceInit(UINT8 periph)
             SPI_InitStructure.SPI_CPOL = SPI_CPOL_High;
             SPI_InitStructure.SPI_CPHA =SPI_CPHA_2Edge;
             SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
-            SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_2;
+            SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_128;
             
             SPI_Init(SPI2_PORT, &SPI_InitStructure);
             

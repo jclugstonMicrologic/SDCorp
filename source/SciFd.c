@@ -93,7 +93,6 @@ BOOL SciTxPacket
     
     for(byteCnt =0; byteCnt<nbrBytes; byteCnt++)
     {
-//TimerDelayUs(10000);
         SciSendByte(sciPort, *pPckt);   
         
         *pPckt ++;

@@ -55,7 +55,9 @@ void Gpio_Init
     LED5_OFF;
     LED6_OFF;    
     BUZZER_OFF;
-     
+    
+    OLED_ASSERT_RST;
+    
     /* configure the following GPIO pins as outputs */
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
     GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
@@ -64,6 +66,9 @@ void Gpio_Init
 
     GPIO_InitStructure.GPIO_Pin = OLED_CS_PIN;
     GPIO_Init(OLED_CS_PORT, &GPIO_InitStructure);        
+        
+    GPIO_InitStructure.GPIO_Pin = OLED_RST_PIN;
+    GPIO_Init(OLED_RST_PORT, &GPIO_InitStructure);  
     
     GPIO_InitStructure.GPIO_Pin = LED1_PIN;
     GPIO_Init(LED1_PORT, &GPIO_InitStructure);        

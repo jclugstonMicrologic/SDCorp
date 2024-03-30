@@ -40,7 +40,7 @@ typedef enum
 }SciAsciiStatesTypeEnum;
 
 
-sci_data_t BluetoothDataCom;
+sci_data_t RadioDataCom;
 
 
 void SciAsciiTaskComx(void * pvParameters);
@@ -99,10 +99,14 @@ BOOL SciAsciiReceiverInit
         
     switch(sciPort)
     {
-        case SCI_BLUETOOTH_COM:
-            pSerialData =&BluetoothDataCom;
+        case SCI_PC_COM:
+            pSerialData =NULL_PTR;
             pSerialData->termChar =0xff;
             break;                                   
+        case SCI_RADIO_COM:
+            pSerialData =&RadioDataCom;
+            pSerialData->termChar =0xff;
+            break;              
     }    
 
     pSerialData->pCmdFunction = pCallBack;
@@ -134,7 +138,7 @@ void SciAsciiTaskComx(void * pvParameters)
     
     for( ;; )
     {       
-        SciAsciiRxMachine(&BluetoothDataCom, SCI_BLUETOOTH_COM);
+        SciAsciiRxMachine(&RadioDataCom, SCI_RADIO_COM);
                
         /* place this task in the blocked state until it is time to run again */
         vTaskDelayUntil( &xNextWakeTime, 1 );  
@@ -166,7 +170,7 @@ int SciAsciiRxMachine
 	    {
                 //if( rxByte <=0x7f ) 
                 {       
-                    /* ASCII character, potential NMEA, or AT command response */ 
+                    /* ASCII character */ 
 		    pSerialData->byteCnt =0;				
                     memset( pSerialData->rxBuffer, 0x00, sizeof(pSerialData->rxBuffer) );
 		    pSerialData->rxBuffer[pSerialData->byteCnt++] =rxByte;
@@ -177,16 +181,7 @@ int SciAsciiRxMachine
 	case SCI_ASCII_RX_CMD_STATE:
             while( SciGetByte( sciPort,&rxByte ) )
 	    {
-                xTicks=xTaskGetTickCount();
-                
-            #if 0
-                if( rxByte >0x7f )
-                {
-                    /* not ASCII/printable character, quit */
-                    status =-1;
-                    break;
-                }
-            #endif    
+                xTicks=xTaskGetTickCount();  
                 
                 pSerialData->rxBuffer[pSerialData->byteCnt] =rxByte;
 			

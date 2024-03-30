@@ -2402,13 +2402,10 @@
             <name>$PROJ_DIR$\source\MainControlTask.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\source\PCMachine.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\source\PowerManagement.c</name>
-        </file>
-        <file>
             <name>$PROJ_DIR$\source\pwmHi.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\source\RadioMachine.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\source\rtcHi.c</name>

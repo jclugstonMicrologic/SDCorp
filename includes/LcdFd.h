@@ -55,12 +55,12 @@ Tools:
 
 //--- Standard definitions for LCD ---
 #define LCD_HOME_L1	0x80
-#define LINE1	0
+#define LINE1	0x00
 
-//HD44780
-#define LINE2	LINE1+0x40
-#define LINE3	LINE1+0x14
-#define	LINE4 	LINE2+0x14
+//KS0073/SSD1803(A)
+#define LINE2	LINE1+0x20
+#define LINE3	LINE1+0x40
+#define	LINE4 	LINE1+0x60
 
 /*
 *****************************************************************************

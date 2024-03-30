@@ -114,4 +114,25 @@ TimerHandle_t TimerCreate( int32_t timeout, void (*pCallBack)() )
 }
 
 
+TimerHandle_t TimerCreateOneshot( int32_t timeout, void (*pCallBack)() )
+{
+    TimerHandle_t xTimers;
+    
+    xTimers =xTimerCreate("Timer", timeout, pdFALSE,( void * )0, pCallBack);
+    
+    if( xTimers != NULL )
+    {
+        /* Start the timer.  No block time is specified, and
+          even if one was it would be ignored because the RTOS
+          scheduler has not yet been started. */
+        if( xTimerStart( xTimers, 0 ) != pdPASS )
+        {
+            /* The timer could not be set into the Active
+               state. */
+        }       
+    }
+    
+    return xTimers;     
+}
+
 

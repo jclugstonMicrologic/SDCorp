@@ -122,7 +122,7 @@ void KeyDropperState(int key_);
 
 /*
 *|----------------------------------------------------------------------------
-*|  Module: KeypadFd Module
+*|  Module: Keypad_Init Module
 *|  Routine: InitKeypad
 *|  Description:
 *|   Initialisation for this module
@@ -133,7 +133,7 @@ void KeyDropperState(int key_);
 *|   *callbackPtr4 =held asserted, then released
 *|----------------------------------------------------------------------------
 */
-void InitKeypad
+void Keypad_Init
 (
    void
 )
@@ -188,6 +188,26 @@ void InitKeypad
    SwitchData[KEY_FWD_JOG].callBackPtr2 =NULL_PTR;
    SwitchData[KEY_FWD_JOG].callBackPtr3 =KeyFwdJog;
    SwitchData[KEY_FWD_JOG].callBackPtr4 =NULL_PTR;   
+   
+   SwitchData[KEY_REV_LOW].callBackPtr1 =NULL_PTR;
+   SwitchData[KEY_REV_LOW].callBackPtr2 =NULL_PTR;
+   SwitchData[KEY_REV_LOW].callBackPtr3 =KeyRevLow;
+   SwitchData[KEY_REV_LOW].callBackPtr4 =NULL_PTR;
+
+   SwitchData[KEY_REV_MED].callBackPtr1 =NULL_PTR;
+   SwitchData[KEY_REV_MED].callBackPtr2 =NULL_PTR;
+   SwitchData[KEY_REV_MED].callBackPtr3 =KeyRevMed;
+   SwitchData[KEY_REV_MED].callBackPtr4 =NULL_PTR;
+
+   SwitchData[KEY_REV_FAST].callBackPtr1 =NULL_PTR;
+   SwitchData[KEY_REV_FAST].callBackPtr2 =NULL_PTR;
+   SwitchData[KEY_REV_FAST].callBackPtr3 =KeyRevFast;
+   SwitchData[KEY_REV_FAST].callBackPtr4 =NULL_PTR;
+   
+   SwitchData[KEY_REV_JOG].callBackPtr1 =NULL_PTR;
+   SwitchData[KEY_REV_JOG].callBackPtr2 =NULL_PTR;
+   SwitchData[KEY_REV_JOG].callBackPtr3 =KeyRevJog;
+   SwitchData[KEY_REV_JOG].callBackPtr4 =NULL_PTR;      
 
 
    for(j =0; j<MAX_NUM_SWITCHES; j++)
@@ -238,20 +258,29 @@ void KeypadMachine
     
    switch( KeypadInfo.currentState )
    {
-      case KEYPAD_MAIN_STATE:
-        
+      case KEYPAD_MAIN_STATE:        
          switch( key_ )
          {
             case KEY_PWR_UP:
-               break;
+                break;
             case KEY_STOP:             
-               break;
+                break;
             case KEY_FWD_LOW:
-               break;
+                break;
             case KEY_FWD_MED:
-               break;
+                break;
             case KEY_FWD_FAST:
-               break;                             
+                break;    
+            case KEY_FWD_JOG:
+                break;       
+            case KEY_REV_LOW:
+                break;
+            case KEY_REV_MED:
+                break;
+            case KEY_REV_FAST:
+                break;                   
+            case KEY_REV_JOG:
+                break;
          }
          break;
 #if 0         
@@ -360,6 +389,37 @@ void KeyFwdJog
 } // end
 
 
+void KeyRevLow
+(
+   void
+)
+{
+   KeyActionRequest =KEY_REV_LOW;
+} // end
+
+void KeyRevMed
+(
+   void
+)
+{
+   KeyActionRequest =KEY_REV_MED;
+} // end
+
+void KeyRevFast
+(
+   void
+)
+{
+   KeyActionRequest =KEY_REV_FAST;
+} // end
+
+void KeyRevJog
+(
+   void
+)
+{
+   KeyActionRequest =KEY_REV_JOG;
+} // end
 
 /*
 *|----------------------------------------------------------------------------
