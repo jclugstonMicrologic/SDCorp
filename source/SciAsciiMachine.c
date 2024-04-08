@@ -168,9 +168,9 @@ int SciAsciiRxMachine
         case SCI_ASCII_RX_IDLE_STATE:                        
             if( SciGetByte( sciPort,&rxByte ) )	
 	    {
-                //if( rxByte <=0x7f ) 
+                if( rxByte ==0x1b ) 
                 {       
-                    /* ASCII character */ 
+                    /* esc character */ 
 		    pSerialData->byteCnt =0;				
                     memset( pSerialData->rxBuffer, 0x00, sizeof(pSerialData->rxBuffer) );
 		    pSerialData->rxBuffer[pSerialData->byteCnt++] =rxByte;
@@ -206,11 +206,8 @@ int SciAsciiRxMachine
                     */                  
                     //SciStateProcess( &pSerialData->common, pSerialData->common.machState, SCI_ASCII_RX_ERROR_STATE);                    
                     
-                    /* rx buffer is half full, lets parse any messages that may be present at this time
-                       process project specific command(s) 
-                    */
-                    if( pSerialData->pCmdFunction !=NULL_PTR )
-                        pSerialData->pCmdFunction(NULL, pSerialData->rxBuffer);      
+                    if( pSerialData->pCmdAltFunction !=NULL_PTR )
+                        pSerialData->pCmdAltFunction(NULL, pSerialData->rxBuffer);      
                     
                     status = -1;
                     break;
@@ -222,7 +219,7 @@ int SciAsciiRxMachine
                 pSerialData->common.timeoutTimer =xTicks;	 
             }
             
-            if( SciCheckTimeout( &pSerialData->common, 25) )//SCI_TIMEOUT_100MSEC) )//SCI_TIMEOUT_500MSEC) )
+            if( SciCheckTimeout( &pSerialData->common, 750) )//SCI_TIMEOUT_100MSEC) )//SCI_TIMEOUT_500MSEC) )
             {
                 /* no more bytes coming in, lets parse any messages that may be present at this time
                    process project specific command(s) 
@@ -230,14 +227,6 @@ int SciAsciiRxMachine
                 if( pSerialData->pCmdAltFunction !=NULL_PTR )
                     pSerialData->pCmdAltFunction(pSerialData->byteCnt, pSerialData->rxBuffer);              
                                    
-            #if 1              
-                for(int j=0; j<sizeof(pSerialData->rxBuffer); j++)
-                {
-                    /* clear any null characters from the buffer */
-                    if(pSerialData->rxBuffer[j] ==0x00 )
-                        pSerialData->rxBuffer[j] =0x7e;
-                }
-            #endif
                 
                 if( pSerialData->pCmdFunction !=NULL_PTR )
                     pSerialData->pCmdFunction(NULL, pSerialData->rxBuffer);     
@@ -262,6 +251,18 @@ int SciAsciiRxMachine
 } 
 
 
+    /*
+*|----------------------------------------------------------------------------
+*|  Routine: SciSendPacket
+*|  Description:
+*|  Retval:
+*|----------------------------------------------------------------------------
+*/
+void SciSendDataPacket(UINT8 port, char *pBuf, uint8_t len)
+{
+    SciTxPacket(port, len, pBuf);      
+}
+    
 /*
 *|----------------------------------------------------------------------------
 *|  Routine: SendString

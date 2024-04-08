@@ -92,6 +92,9 @@ void KeyRevMed(void);
 void KeyRevFast(void);
 void KeyRevJog(void);
 
+void KeyReleaseFwdJog(void);
+void KeyReleaseRevJog(void);
+
 enum
 {
    CONTACT_ID =0,
@@ -115,8 +118,8 @@ enum
    KEY_REV_FAST,  
    KEY_REV_JOG,      
 
-   KEY_HELD_UP,
-   KEY_HELD_DOWN,
+   KEY_RELEASE_FWD_JOG,
+   KEY_RELEASE_REV_JOG,
      
    KEY_VIRTUAL,
      

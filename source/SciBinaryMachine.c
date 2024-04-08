@@ -338,7 +338,7 @@ int SciBinaryRxMachine
 */
 void SciSendPacket(UINT8 sciPort, UINT16 cmd, UINT16 nbrBytes, char *pPayload)
 {   
-    static UINT8 txBuf[256];
+    static UINT8 txBuf[64];
     UINT16 j =0;
     UINT16 calculatedCrc;
     UINT16 payloadSize;

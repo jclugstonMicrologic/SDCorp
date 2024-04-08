@@ -2414,9 +2414,6 @@
             <name>$PROJ_DIR$\source\SciAsciiMachine.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\source\SciBinaryMachine.c</name>
-        </file>
-        <file>
             <name>$PROJ_DIR$\source\SciFd.c</name>
         </file>
         <file>

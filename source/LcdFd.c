@@ -112,7 +112,7 @@ void Lcd_Init( void )
     lcdData(0x00);    //ROM_A = 0x00, ROM_B = 0x04, ROM_C = 0x0C
     lcdCommand(0x38); //FunctionSet: N=1 DH=0 RE=0 IS=0
     //lcdCommand(0x0D); //Display blink cursor on
-    lcdCommand(0x08 | (DISPLAY_ON | BLINK_ON) );
+    lcdCommand(0x08 | (DISPLAY_ON | CURSOR_ON | BLINK_ON) );
     lcdCommand(0x01); //Clear display
 #endif
 }

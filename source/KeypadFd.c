@@ -22,6 +22,13 @@
 */
 #include <stddef.h>
 
+#include "FreeRTOS.h"
+#include "timers.h"
+
+#include "gpioHi.h"
+
+#include "sysTimers.h"
+#include "SciAsciiMachine.h"
 #include "keypadFd.h"
 
 
@@ -73,11 +80,14 @@ enum
    KEYPAD_LAST_STATE
 };
 
+
 typedef struct
 {
    UINT8 currentState;
    UINT8 prevState;
    UINT32 waitTimer;
+   
+   void (*keyCallback)(void);
 }KEY_PAD_INFO;
 
 /*
@@ -187,7 +197,7 @@ void Keypad_Init
    SwitchData[KEY_FWD_JOG].callBackPtr1 =NULL_PTR;
    SwitchData[KEY_FWD_JOG].callBackPtr2 =NULL_PTR;
    SwitchData[KEY_FWD_JOG].callBackPtr3 =KeyFwdJog;
-   SwitchData[KEY_FWD_JOG].callBackPtr4 =NULL_PTR;   
+   SwitchData[KEY_FWD_JOG].callBackPtr4 =KeyReleaseFwdJog;   
    
    SwitchData[KEY_REV_LOW].callBackPtr1 =NULL_PTR;
    SwitchData[KEY_REV_LOW].callBackPtr2 =NULL_PTR;
@@ -207,7 +217,7 @@ void Keypad_Init
    SwitchData[KEY_REV_JOG].callBackPtr1 =NULL_PTR;
    SwitchData[KEY_REV_JOG].callBackPtr2 =NULL_PTR;
    SwitchData[KEY_REV_JOG].callBackPtr3 =KeyRevJog;
-   SwitchData[KEY_REV_JOG].callBackPtr4 =NULL_PTR;      
+   SwitchData[KEY_REV_JOG].callBackPtr4 =KeyReleaseRevJog;      
 
 
    for(j =0; j<MAX_NUM_SWITCHES; j++)
@@ -223,7 +233,120 @@ void Keypad_Init
               
 }/* end InitKeypad */
 
-#define BUZZER_ON_TIME (150)
+void SendKeyPwrupMsg(void)
+{
+    char radioTxBuf[]={0x01,0x7f,0x01,0x01,0x01};
+    uint8_t len =sizeof(radioTxBuf);
+  
+    SciSendDataPacket(SCI_RADIO_COM, radioTxBuf, len);
+}
+
+void SendKeyStopMsg(void)
+{
+    char radioTxBuf[]={0x01,0x7f,0x01,0x03,0x10,0x00,0x00};
+    uint8_t len =sizeof(radioTxBuf);
+  
+    SciSendDataPacket(SCI_RADIO_COM, radioTxBuf, len);
+}
+
+void SendKeyFwdLowMsg(void)
+{
+    char radioTxBuf[]={0x01,0x7f,0x01,0x03,0x10,0x5a,0x5a};
+    uint8_t len =sizeof(radioTxBuf);
+  
+    SciSendDataPacket(SCI_RADIO_COM, radioTxBuf, len);
+}
+
+void SendKeyFwdMedMsg(void)
+{
+    char radioTxBuf[]={0x01,0x7f,0x01,0x03,0x10,0x6e,0x6e};
+    uint8_t len =sizeof(radioTxBuf);
+  
+    SciSendDataPacket(SCI_RADIO_COM, radioTxBuf, len);
+}
+
+void SendKeyFwdFastMsg(void)
+{
+    char radioTxBuf[]={0x01,0x7f,0x01,0x03,0x10,0x7f,0x7f};
+    uint8_t len =sizeof(radioTxBuf);
+  
+    SciSendDataPacket(SCI_RADIO_COM, radioTxBuf, len);
+}
+
+void SendKeyFwdJogMsg(void)
+{
+    char radioTxBuf[]={0x01,0x7f,0x01,0x03,0x10,0x32,0x32};
+    uint8_t len =sizeof(radioTxBuf);
+  
+    SciSendDataPacket(SCI_RADIO_COM, radioTxBuf, len);
+}
+
+
+void SendKeyRevLowMsg(void)
+{
+    char radioTxBuf[]={0x01,0x7f,0x01,0x03,0x10,0x81,0x81};
+    uint8_t len =sizeof(radioTxBuf);
+  
+    SciSendDataPacket(SCI_RADIO_COM, radioTxBuf, len);
+}
+
+void SendKeyRevMedMsg(void)
+{
+    char radioTxBuf[]={0x01,0x7f,0x01,0x03,0x10,0x92,0x92};
+    uint8_t len =sizeof(radioTxBuf);
+  
+    SciSendDataPacket(SCI_RADIO_COM, radioTxBuf, len);
+}
+
+void SendKeyRevFastMsg(void)
+{
+    char radioTxBuf[]={0x01,0x7f,0x01,0x03,0x10,0xa6,0xa6};
+    uint8_t len =sizeof(radioTxBuf);
+  
+    SciSendDataPacket(SCI_RADIO_COM, radioTxBuf, len);
+}
+
+void SendKeyRevJogMsg(void)
+{
+    char radioTxBuf[]={0x01,0x7f,0x01,0x03,0x10,0xce,0xce};
+    uint8_t len =sizeof(radioTxBuf);
+  
+    SciSendDataPacket(SCI_RADIO_COM, radioTxBuf, len);
+}
+
+/*
+*|----------------------------------------------------------------------------
+*|  Routine: Buzzer_Toggle_Timer_Callback
+*|  Description:
+*|  Retval:
+*|----------------------------------------------------------------------------
+*/
+static void Buzzer_Toggle_Timer_Callback (void * pvParameter)
+{          
+    BUZZER_TOGGLE;
+}
+
+/*
+*|----------------------------------------------------------------------------
+*|  Routine: Buzzer_StartPeriodicBuzz
+*|  Description:
+*|  Retval:
+*|----------------------------------------------------------------------------
+*/
+void Buzzer_StartPeriodicBuzz(void)
+{
+    #define BUZZER_TIMER_PERIOD      500          /**< Timer period (msec) */
+
+    TimerHandle_t timer_handle; 
+    timer_handle =TimerCreate(BUZZER_TIMER_PERIOD, Buzzer_Toggle_Timer_Callback);    
+}
+
+static void Buzzer_Off_Timer_Callback (void * pvParameter)
+{
+    BUZZER_OFF;
+}
+
+#define BUZZER_KEY_ON_TIME (150)
 /*
 *|----------------------------------------------------------------------------
 *|  Module: KeypadFd Module
@@ -242,7 +365,7 @@ void KeypadMachine
     L O C A L   D A T A
    ***********************
    */
-
+   
    /*
    *************************
     E R R O R   C H E C K S
@@ -255,76 +378,51 @@ void KeypadMachine
     C O D E
    *************************
    */  
-    
+   
    switch( KeypadInfo.currentState )
    {
       case KEYPAD_MAIN_STATE:        
          switch( key_ )
          {
-            case KEY_PWR_UP:
+            case KEY_PWR_UP: //key1
                 break;
-            case KEY_STOP:             
+            case KEY_STOP:  //key6           
                 break;
-            case KEY_FWD_LOW:
+            case KEY_FWD_LOW: //key2
                 break;
-            case KEY_FWD_MED:
+            case KEY_FWD_MED: //key3
                 break;
-            case KEY_FWD_FAST:
+            case KEY_FWD_FAST: //key4
                 break;    
-            case KEY_FWD_JOG:
+            case KEY_FWD_JOG: //key5
                 break;       
+            case KEY_RELEASE_FWD_JOG: //key5
+                break;        
             case KEY_REV_LOW:
-                break;
             case KEY_REV_MED:
-                break;
             case KEY_REV_FAST:
-                break;                   
             case KEY_REV_JOG:
+                //Buzzer_StartPeriodicBuzz();
                 break;
+            case KEY_RELEASE_REV_JOG: //
+                break;                  
          }
          break;
 #if 0         
       case KEYPAD_RUN_STATE:
          KeyRunState(key_);
          break;
-      case KEYPAD_LOAD_STATE:
-         KeyLoadState(key_);
-         break;
-      case KEYPAD_SETUP_STATE:
-         KeySetupState(key_);
-         break;
-      case KEYPAD_RUN_AUTO_DIR_STATE:
-         KeyRunAutoDirState(key_);
-         break;         
-      case KEYPAD_RUN_AUTO_RATE_STATE:
-         KeyRunAutoRateState(key_);
-         break;
-      case KEYPAD_RUN_MANUAL_STATE:
-         KeyRunManualState(key_);                         
-         break;         
-      case KEYPAD_LOAD_INDEX_STATE:
-         KeyLoadIndexState(key_);
-         break;
-      case KEYPAD_SETUP_CANNISTER_STATE:
-         KeySetupCannisterState(key_);
-         break;
-      case KEYPAD_SETUP_BATTERY_STATE:
-         KeySetupBatteryState(key_);
-         break;         
-      case KEYPAD_TEST_DIR_STATE:
-         KeyTestDirState(key_);        
-         break; 
-      case KEYPAD_TEST_RATE_STATE:
-         KeyTestRateState(key_);
-         break;           
-      case KEYPAD_DROPPER_STATE:         
-         KeyDropperState(key_);
-         break;
 #endif         
    }
    
    if( KeyActionRequest !=KEY_NONE )
    {
+      /*!!!! TEST !!!!*/      
+      KeypadInfo.keyCallback =SendKeyStopMsg;
+      
+      BUZZER_ON;
+      KeypadInfo.keyCallback();      
+      TimerCreateOneshot(BUZZER_KEY_ON_TIME, Buzzer_Off_Timer_Callback); 
    }
    
    KeyActionRequest =KEY_NONE;
@@ -346,6 +444,7 @@ void KeyPwrUp
 )
 {
    KeyActionRequest =KEY_PWR_UP;
+   KeypadInfo.keyCallback =SendKeyPwrupMsg;
 } // end
 
 void KeyStop
@@ -354,6 +453,7 @@ void KeyStop
 )
 {
    KeyActionRequest =KEY_STOP;
+   KeypadInfo.keyCallback =SendKeyStopMsg;
 } // end
 
 void KeyFwdLow
@@ -362,6 +462,7 @@ void KeyFwdLow
 )
 {
    KeyActionRequest =KEY_FWD_LOW;
+   KeypadInfo.keyCallback =SendKeyFwdLowMsg;
 } // end
 
 void KeyFwdMed
@@ -370,6 +471,7 @@ void KeyFwdMed
 )
 {
    KeyActionRequest =KEY_FWD_MED;
+   KeypadInfo.keyCallback =SendKeyFwdMedMsg;
 } // end
 
 void KeyFwdFast
@@ -378,6 +480,7 @@ void KeyFwdFast
 )
 {
    KeyActionRequest =KEY_FWD_FAST;
+   KeypadInfo.keyCallback =SendKeyFwdFastMsg;
 } // end
 
 void KeyFwdJog
@@ -386,6 +489,17 @@ void KeyFwdJog
 )
 {
    KeyActionRequest =KEY_FWD_JOG;
+   KeypadInfo.keyCallback =SendKeyFwdJogMsg;
+} // end
+
+
+void KeyReleaseFwdJog
+(
+   void
+)
+{
+   KeyActionRequest =KEY_RELEASE_FWD_JOG;
+   KeypadInfo.keyCallback =SendKeyStopMsg;
 } // end
 
 
@@ -395,6 +509,7 @@ void KeyRevLow
 )
 {
    KeyActionRequest =KEY_REV_LOW;
+   KeypadInfo.keyCallback =SendKeyRevLowMsg;
 } // end
 
 void KeyRevMed
@@ -403,6 +518,7 @@ void KeyRevMed
 )
 {
    KeyActionRequest =KEY_REV_MED;
+   KeypadInfo.keyCallback =SendKeyRevMedMsg;
 } // end
 
 void KeyRevFast
@@ -411,6 +527,7 @@ void KeyRevFast
 )
 {
    KeyActionRequest =KEY_REV_FAST;
+   KeypadInfo.keyCallback =SendKeyRevFastMsg;
 } // end
 
 void KeyRevJog
@@ -419,8 +536,17 @@ void KeyRevJog
 )
 {
    KeyActionRequest =KEY_REV_JOG;
+   KeypadInfo.keyCallback =SendKeyRevJogMsg;
 } // end
 
+void KeyReleaseRevJog
+(
+   void
+)
+{
+   KeyActionRequest =KEY_RELEASE_REV_JOG;
+   KeypadInfo.keyCallback =SendKeyStopMsg;
+} // end
 /*
 *|----------------------------------------------------------------------------
 *|  Module: KeypadFd Module
@@ -432,106 +558,7 @@ void KeyRunState(int key_)
 {
 }
 
-
 #if 0
-/*
-*|----------------------------------------------------------------------------
-*|  Module: KeypadFd Module
-*|  Routine: KeyLoadState
-*|  Description:
-*|----------------------------------------------------------------------------
-*/
-void KeyLoadState(int key_)
-{
-   switch( key_ )        
-   {
-      case KEY_LEFT:
-//         if( MotorControl.indexing ==1 )              
-//         if( BallCount.load !=0 )    
-         if( MotorControl.indexing ==1 || BallCount.load !=0 )  
-         {
-            // loading has been started, going back is no longer an option
-            // key is now reverse           
-            Motor.load.direction =MOTOR_REV;
-            
-            if( Motor.load.start ==0 )
-            {
-               // start motor           
-               Motor.load.start =1;
-               MotorControl.indexing =1; 
-            }
-            else
-            {
-               // stop motor
-               Motor.load.start =0;                 
-            }                     
-         }
-         else
-            MainDisplay(); // go back              
-         break;
-      case KEY_UP:
-      case KEY_HELD_UP:              
-         if( (MotorControl.indexing ==1 || BallCount.load !=0) && Motor.load.start ==0 )  
-         {
-            // loading has been started, going back is no longer an option
-            if( Motor.load.start ==0 ) // only change menu if motor stopped                 
-            {
-               KeypadInfo.currentState =KEYPAD_LOAD_INDEX_STATE;
-               LcdMachineState =LCD_LOAD_INDEX_SCREEN;                                
-                
-               if( BallCount.load ==MAX_BALL_COUNT)                
-                  MotorControl.indexState =INDEX_COMPLETE_STATE;
-            }           
-         }
-         else
-         {
-            // adjust speed if available to do so
-//            if( Motor.load.start )
-            {
-               if( ++Motor.load.rate >MAX_MOTOR_RATE )
-               {
-                  Motor.load.rate =MAX_MOTOR_RATE;
-               }
-            }
-         }                  
-         break;
-      case KEY_DOWN:
-      case KEY_HELD_DOWN:
-         // adjust speed if available to do so
-//         if( Motor.load.start )
-         {        
-            if( --Motor.load.rate ==0 )
-            {
-               Motor.load.rate =MIN_MOTOR_RATE;
-            }
-         }
-         break;
-      case KEY_ENTER:
-         if( !Motor.load.start &&
-              MotorControl.indexState !=INDEX_COMPLETE_STATE            
-           )
-         {
-            // start motor      
-            Motor.load.direction =MOTOR_FWD;
-            
-            Motor.load.start =true;
-            MotorControl.indexing =1; 
-            
-            MotorControl.indexState =INDEX_IDLE_STATE;            
-         }
-         else
-         {
-            // stop motor
-            Motor.load.start =false;                 
-         }         
-         break; 
-      case KEY_UPDATE_SCREEN:
-         // update LCD values
-         LcdMachineState =LCD_LOAD_UPDATE_SCREEN;
-         break;                 
-   }                
-}
-
 /*
 *|----------------------------------------------------------------------------
 *|  Module: KeypadFd Module
@@ -576,530 +603,6 @@ void KeySetupState(int key_)
    }
 }
 
-
-/*
-*|----------------------------------------------------------------------------
-*|  Module: KeypadFd Module
-*|  Routine: KeyRunAutoDirState
-*|  Description:
-*|----------------------------------------------------------------------------
-*/
-void KeyRunAutoDirState(int key_)
-{
-   switch( key_ )        
-   {
-      case KEY_LEFT:
-         // go back
-         KeypadInfo.currentState =KEYPAD_RUN_STATE;
-         LcdMachineState =LCD_RUN_SCREEN;               
-         break;
-      case KEY_UP:               
-      case KEY_HELD_UP:              
-      case KEY_DOWN:
-      case KEY_HELD_DOWN:              
-         if( ++Motor.injection.direction >1 )
-         {
-            Motor.injection.direction =MOTOR_FWD;                 
-         }
-         break;
-      case KEY_ENTER:             
-         KeypadInfo.currentState =KEYPAD_RUN_AUTO_RATE_STATE;
-         LcdMachineState =LCD_RUN_AUTO_RATE_SCREEN;                   
-         break;   
-      case KEY_UPDATE_SCREEN:
-         // update LCD values
-         LcdMachineState =LCD_RUN_AUTO_UPDATE_DIR_SCREEN;
-         break;        
-   }
-} // end KeyRunAutoDirState(int key_)
-
-
-/*
-*|----------------------------------------------------------------------------
-*|  Module: KeypadFd Module
-*|  Routine: KeyRunAutoRateState
-*|  Description:
-*|----------------------------------------------------------------------------
-*/
-void KeyRunAutoRateState(int key_)
-{
-   switch( key_ )        
-   {
-      case KEY_LEFT:
-         // stop motor, go back
-         Motor.injection.start =0;
-                            
-         // go back to direction adjust
-         KeypadInfo.currentState =KEYPAD_RUN_AUTO_DIR_STATE;
-         LcdMachineState =LCD_RUN_AUTO_DIR_SCREEN;
-               
-         break;
-      case KEY_UP:               
-      case KEY_HELD_UP:              
-         if( ++Motor.injection.rate >MAX_MOTOR_RATE )
-         {
-            Motor.injection.rate =MAX_MOTOR_RATE;                 
-         }
-         break;
-      case KEY_DOWN:
-      case KEY_HELD_DOWN:              
-         if( --Motor.injection.rate ==0 )
-         {
-            Motor.injection.rate =MIN_MOTOR_RATE;
-         }
-         break;
-      case KEY_ENTER:
-         // start motor
-         if( Motor.injection.start ==0 )
-            Motor.injection.start =1;
-         else
-         {
-            Motor.injection.start =0;                 
-         }
-         break;   
-      case KEY_UPDATE_SCREEN:
-         // update LCD values
-         LcdMachineState =LCD_RUN_AUTO_UPDATE_RATE_SCREEN;
-         break;        
-   } 
-} // end KeyRunAutoRateState(int key_)
-
-
-/*
-*|----------------------------------------------------------------------------
-*|  Module: KeypadFd Module
-*|  Routine: KeyRunManualState
-*|  Description:
-*|----------------------------------------------------------------------------
-*/
-void KeyRunManualState(int key_)
-{
-   switch( key_ )        
-   {
-       case KEY_LEFT:
-          // stop motor, go back
-          Motor.manual.start =0;
-          KeypadInfo.currentState =KEYPAD_RUN_STATE;
-          LcdMachineState =LCD_RUN_SCREEN;                
-          break;
-      case KEY_UP:
-      case KEY_HELD_UP:              
-      case KEY_DOWN:
-      case KEY_HELD_DOWN:                             
-         if( ++Motor.manual.direction >1 )
-         {
-            Motor.manual.direction =MOTOR_FWD;                 
-         }
-         break;
-      case KEY_ENTER:
-         // manual mode      
-         Motor.manual.rate =100;
-               
-         if( Motor.manual.start ==0 )              
-            Motor.manual.start =1;
-         else
-            Motor.manual.start =0; 
-         break;
-      case KEY_UPDATE_SCREEN:
-         // update LCD values
-         LcdMachineState =LCD_RUN_MANUAL_UPDATE_SCREEN;
-         break;                       
-   }        
-}
-
-
-/*
-*|----------------------------------------------------------------------------
-*|  Module: KeypadFd Module
-*|  Routine: KeyLoadIndexState
-*|  Description:
-*|----------------------------------------------------------------------------
-*/
-void KeyLoadIndexState(int key_)
-{
-   switch( key_ )        
-   {
-      case KEY_LEFT:
-         if( MotorControl.indexState ==INDEX_IDLE_STATE )
-         {
-            // stop motor, go back a screen
-            Motor.manual.start =0;
-            KeypadInfo.currentState =KEYPAD_LOAD_STATE;
-            LcdMachineState =LCD_LOAD_SCREEN;                                             
-         }
-         else
-         {
-            // reverse
-            Motor.index.direction =MOTOR_REV;           
-            
-            if( Motor.index.start ==0 )
-            {
-               // start motor           
-               Motor.index.start =1;            
-            }
-            else
-            {
-               Motor.index.start =0;
-            }
-         }
-         break;
-      case KEY_UP:
-      case KEY_HELD_UP:   
-         if( MotorControl.indexState ==INDEX_COMPLETE_STATE )
-         {
-            if( Motor.index.start ==0 && BallCount.index !=0 )
-            {
-               // start motor           
-               Motor.index.start =1;
-            
-               Motor.index.direction =MOTOR_FWD;            
-            }  
-            else
-            {
-               Motor.index.start =0;                 
-            }
-         }
-         else
-         {
-            if( ++Motor.index.rate >MAX_MOTOR_RATE )
-            {
-               Motor.index.rate =MAX_MOTOR_RATE;                 
-            }
-         }
-         break;
-      case KEY_DOWN:
-      case KEY_HELD_DOWN:               
-         if( MotorControl.indexState ==INDEX_COMPLETE_STATE )
-         {
-            MainDisplay();        
-         }
-         else
-         {
-            if( --Motor.index.rate ==0 )
-            {
-               Motor.index.rate =MIN_MOTOR_RATE;                
-            }
-         }
-         break;
-      case KEY_ENTER:
-         if( MotorControl.indexState ==INDEX_COMPLETE_STATE )
-         {
-            // still allow motor to stop, just no start
-            Motor.index.start =0;
-            break;
-         }
-         
-         if( Motor.index.start ==0 )
-         {
-            // start motor           
-            Motor.index.start =1;
-            
-            Motor.index.direction =MOTOR_FWD;
-              
-            MotorControl.indexState =INDEX_START_STATE;
-         }
-         else
-         {
-            // stop motor
-            Motor.index.start =0;                 
-            
-            MotorControl.indexState =INDEX_STOP_STATE;            
-         }
-         break;       
-      case KEY_UPDATE_SCREEN:
-         // update LCD values
-         LcdMachineState =LCD_LOAD_INDEX_UPDATE_SCREEN;
-         break;                                
-   }                
-}
-
-
-/*
-*|----------------------------------------------------------------------------
-*|  Module: KeypadFd Module
-*|  Routine: KeySetupCannisterState
-*|  Description:
-*|----------------------------------------------------------------------------
-*/
-void KeySetupCannisterState(int key_)
-{     
-   switch( key_ )        
-   {
-      case KEY_LEFT:
-         // go back
-         MainDisplay();         
-         break;
-#ifndef SIX_BALLS_PER_REV    
-      case KEY_UP:        
-         if( MotorControl.ballsPerRev ==8 )
-         {
-            MotorControl.ballsPerRev =4;
-            MotorControl.vanesPerBall =8;
-         }
-         else
-         {
-            MotorControl.ballsPerRev =8;
-            MotorControl.vanesPerBall =4;
-         }                 
-         
-         SaveToInternalMemory( APP_START_ADDRESS );
-         break;
-      case KEY_DOWN:
-         if( MotorControl.ballsPerRev ==8 )
-         {
-            MotorControl.ballsPerRev =4;
-            MotorControl.vanesPerBall =8;
-         }
-         else
-         {
-            MotorControl.ballsPerRev =8;
-            MotorControl.vanesPerBall =4;
-         }                          
-         
-         SaveToInternalMemory( APP_START_ADDRESS );                  
-         break;
-#endif         
-      case KEY_ENTER:
-         // go back
-         KeypadInfo.currentState =KEYPAD_SETUP_BATTERY_STATE;
-         LcdMachineState =LCD_SETUP_BATTERY_SCREEN;
-         break;  
-      case KEY_UPDATE_SCREEN:
-         // update LCD values
-         LcdMachineState =LCD_SETUP_CANNISTER_UPDATE_SCREEN;
-         break;                          
-   }                
-}
-
-
-
-/*
-*|----------------------------------------------------------------------------
-*|  Module: KeypadFd Module
-*|  Routine: KeySetupBatteryState
-*|  Description:
-*|----------------------------------------------------------------------------
-*/
-void KeySetupBatteryState(int key_)
-{     
-#ifdef OLD  
-   switch( key_ )        
-   {
-      case KEY_LEFT:
-         Motor.test.start =0;  
-         Motor.test.rate =100;
-         KeypadInfo.currentState =KEYPAD_TEST_DIR_STATE;
-         LcdMachineState =LCD_SETUP_TEST_DIR_SCREEN;               
-         break;
-      case KEY_UP:
-      case KEY_DOWN:  
-      case KEY_HELD_UP:
-      case KEY_HELD_DOWN:
-         if( !Motor.test.start )
-         {
-            // only switch direction when stopped
-            if( ++Motor.test.direction >1 )
-            {
-               Motor.test.direction =MOTOR_FWD;                 
-            }
-         }
-         break;
-      case KEY_ENTER:
-         Motor.test.rate =250;
-         // start motor
-         if( Motor.test.start ==0 )
-            Motor.test.start =1;
-         else
-         {
-            Motor.test.start =0;                 
-         }              
-         break;  
-      case KEY_UPDATE_SCREEN:
-         // update LCD values
-         LcdMachineState =LCD_SETUP_BATTERY_UPDATE_SCREEN;
-         break;               
-   }                
-#else
-   switch( key_ )        
-   {
-      case KEY_LEFT:         
-      case KEY_UP:
-//      case KEY_HELD_LEFT:        
-//      case KEY_HELD_UP:
-         if( !Motor.test.start )
-         {
-            // only switch direction when stopped
-            if( ++Motor.test.direction >1 )
-            {
-               Motor.test.direction =MOTOR_FWD;                 
-            }
-         }        
-         break;
-      case KEY_DOWN:
-         Motor.test.rate =250;
-         // start motor
-         if( Motor.test.start ==0 )
-            Motor.test.start =1;
-         else
-         {
-            Motor.test.start =0;                 
-         }              
-         break;  
-      case KEY_ENTER:       
-         Motor.test.start =0;  
-         Motor.test.rate =100;
-         KeypadInfo.currentState =KEYPAD_TEST_DIR_STATE;
-         LcdMachineState =LCD_SETUP_TEST_DIR_SCREEN;               
-         break;         
-      case KEY_UPDATE_SCREEN:
-         // update LCD values
-         LcdMachineState =LCD_SETUP_BATTERY_UPDATE_SCREEN;
-         break;               
-   }                   
-#endif   
-}
-
-
-/*
-*|----------------------------------------------------------------------------
-*|  Module: KeypadFd Module
-*|  Routine: KeyTestDirState
-*|  Description:
-*|----------------------------------------------------------------------------
-*/
-void KeyTestDirState(int key_)
-{     
-   switch( key_ )        
-   {
-            case KEY_LEFT:
-               // go back
-               MainDisplay();
-               break;
-            case KEY_UP:
-            case KEY_DOWN:  
-            case KEY_HELD_UP:
-            case KEY_HELD_DOWN:
-               if( ++Motor.test.direction >1 )
-               {
-                  Motor.test.direction =MOTOR_FWD;                 
-               }
-               break;
-            case KEY_ENTER:   
-               KeypadInfo.currentState =KEYPAD_TEST_RATE_STATE;
-               LcdMachineState =LCD_SETUP_TEST_RATE_SCREEN;              
-               break;      
-             case KEY_UPDATE_SCREEN:
-               // update LCD values
-               LcdMachineState =LCD_SETUP_TEST_UPDATE_DIR_SCREEN;
-               break;                
-   }                
-}
-
-
-/*
-*|----------------------------------------------------------------------------
-*|  Module: KeypadFd Module
-*|  Routine: KeyTestRateState
-*|  Description:
-*|----------------------------------------------------------------------------
-*/
-void KeyTestRateState(int key_)
-{     
-   switch( key_ )        
-   {
-            case KEY_LEFT:
-               // stop motor, go back
-               Motor.test.start =0;              
-               
-               // go back to mode where direction can be changed
-               Motor.test.start =0;  
-               KeypadInfo.currentState =KEYPAD_TEST_DIR_STATE;
-               LcdMachineState =LCD_SETUP_TEST_DIR_SCREEN;                              
-               break;
-            case KEY_UP:               
-            case KEY_HELD_UP:              
-               if( ++Motor.test.rate >MAX_MOTOR_RATE )
-               {
-                  Motor.test.rate =MAX_MOTOR_RATE;                 
-               }
-               break;
-            case KEY_DOWN:
-            case KEY_HELD_DOWN:              
-               if( --Motor.test.rate ==0 )
-               {
-                  Motor.test.rate =MIN_MOTOR_RATE;
-               }
-               break;
-      case KEY_ENTER: 
-         if( Motor.test.start ==0 )
-            Motor.test.start =1;
-         else
-         {
-            Motor.test.start =0;                 
-         }                  
-         break;      
-      case KEY_UPDATE_SCREEN:
-         // update LCD values
-         LcdMachineState =LCD_SETUP_TEST_UPDATE_RATE_SCREEN;
-         break;                
-   }                
-}
-
-
-/*
-*|----------------------------------------------------------------------------
-*|  Module: KeypadFd Module
-*|  Routine: KeyDropperState
-*|  Description:
-*|----------------------------------------------------------------------------
-*/
-void KeyDropperState(int key_)
-{
-   switch( key_ )
-   {
-      case KEY_LEFT:
-         // go back
-         LcdRow =0;
-         MainDisplay();
-         break;
-      case KEY_UP:
-         // JOG+
-         Motor.jog.rate =100;
-
-         Motor.jog.direction =MOTOR_FWD;
-                  
-         if( Motor.jog.start ==0 )              
-            Motor.jog.start =1;
-         else
-            Motor.jog.start =0;                 
-         break;
-      case KEY_DOWN:
-         //JOG-
-         Motor.jog.rate =100;
-
-         Motor.jog.direction =MOTOR_REV;
-                  
-         if( Motor.jog.start ==0 )              
-            Motor.jog.start =1;
-         else
-            Motor.jog.start =0;                 
-         break;
-      case KEY_ENTER:
-         // DROP
-         // manual mode      
-         Motor.manual.rate =100;
-                  
-         if( Motor.manual.start ==0 )              
-            Motor.manual.start =1;
-         else
-            Motor.manual.start =0;         
-         break;               
-      case KEY_UPDATE_SCREEN:
-         // update LCD values
-         LcdMachineState =LCD_DROPPER_UPDATE_SCREEN;
-         break;         
-   }  
-}
 #endif
 
 // end KeypadFd.c

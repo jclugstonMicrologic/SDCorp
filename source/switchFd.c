@@ -1,6 +1,6 @@
 /** C Source ******************************************************************
 *
-* NAME      MainControlTask.c
+* NAME      switchFd.c
 *
 * SUMMARY   
 *
@@ -11,7 +11,7 @@
 * REVISION LOG
 *
 *******************************************************************************
-* Copyright (c) 2020, MICROLOGIC
+* Copyright (c) 2024, MICROLOGIC
 * Calgary, Alberta, Canada, www.micrologic.ab.ca
 *******************************************************************************/
 

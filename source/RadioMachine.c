@@ -29,7 +29,8 @@
 #include "SciBinaryMachine.h"
 #include "SciAsciiMachine.h"
 
-//#include "MainControlTask.h"
+#include "gpioHi.h"
+#include "LcdFd.h"
 #include "RadioMachine.h"
 
 #include "sysTimers.h"
@@ -144,12 +145,82 @@ void Radio_SendString(char *pBuf)
 */
 void Radio_ProcessCommands
 (
-    int cmd,
+    int nbrbytes,
     char *pRxBuf  /* pointer to the receive buffer */      
 )
-{          
+{   
+    int j=0, k=0;
+    char abyte =0x1b;
+    char cmdArr[32];
+    while(j<nbrbytes)
+    {
+        //abyte =*pRxBuf;
+        
+        if( abyte ==0x1b )
+        {
+            abyte =*pRxBuf ++;
+            j++;
+            while(abyte !=0x1b)
+            {
+                cmdArr[k++] =abyte;
+                abyte =*pRxBuf ++;
+                if( j++ >nbrbytes)
+                    break;
+            }
+            
+            if( strstr(cmdArr,"HBattery") )
+            {
+                cmdArr[15]  =0x00;
+                Lcd_SendString(LINE1, &cmdArr[1]);
+            }
+            if( strstr(cmdArr,"PWM Level") )
+            {
+                cmdArr[18]  =0x00;
+                Lcd_SendString(LINE2, &cmdArr[3]);            
+            }
+            if( strstr(cmdArr,"PA") )
+            {
+                LED2_OFF;
+            }
+            if( strstr(cmdArr,"PB") )
+            {
+                LED3_OFF;
+            }       
+            if( strstr(cmdArr,"PC") )
+            {
+                LED4_OFF;
+            }            
+            if( strstr(cmdArr,"PD") )
+            {
+                LED5_OFF;
+            }       
+            if( strstr(cmdArr,"PE") )
+            {
+                LED6_OFF;
+            }       
+            if( strstr(cmdArr,"PK") )
+            {
+                LED3_ON;
+            }                   
+            if( strstr(cmdArr,"PH") )
+            {
+                LED1_ON;
+            }            
+            if( strstr(cmdArr,"PM") )
+            {
+                LED2_ON;
+            } 
+            if( strstr(cmdArr,"PI") )
+            {
+                LED6_ON;
+            }             
+            
+            k=0;
+        }       
+    }
+    
     /* send a packet */
-    SciSendPacket(SCI_RADIO_COM, cmd, 5, RadioSerialTxBuffer);     
+    //SciSendPacket(SCI_RADIO_COM, cmd, 5, RadioSerialTxBuffer);     
 }
 
 /*

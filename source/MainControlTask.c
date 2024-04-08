@@ -83,18 +83,6 @@ static void Led_Toggle_Timer_Callback (void * pvParameter)
     LED1_TOGGLE;
 }
 
-/*
-*|----------------------------------------------------------------------------
-*|  Routine: Buzzer_Toggle_Timer_Callback
-*|  Description:
-*|  Retval:
-*|----------------------------------------------------------------------------
-*/
-static void Buzzer_Toggle_Timer_Callback (void * pvParameter)
-{          
-    BUZZER_TOGGLE;
-}
-
 
 /*
 *|----------------------------------------------------------------------------
@@ -106,37 +94,14 @@ static void Buzzer_Toggle_Timer_Callback (void * pvParameter)
 void LedFlash_StartPeriodicToggle(void)
 {
     #define TIMER_PERIOD      200          /**< Timer period (msec) */  
-#if 0  
-    /* Start timer for LED1 blinking */
-    TimerHandle_t read_timer_handle; 
-    read_timer_handle =xTimerCreate( "led", TIMER_PERIOD, pdTRUE, NULL, Led_Toggle_Timer_Callback);
-    xTimerStart(read_timer_handle, 0);
-#endif
+
     TimerHandle_t timer_handle; 
     timer_handle =TimerCreate(TIMER_PERIOD, Led_Toggle_Timer_Callback);
     
     //xTimerStop(timer_handle, 0);
 }
 
-/*
-*|----------------------------------------------------------------------------
-*|  Routine: Buzzer_StartPeriodicBuzz
-*|  Description:
-*|  Retval:
-*|----------------------------------------------------------------------------
-*/
-void Buzzer_StartPeriodicBuzz(void)
-{
-    #define BUZZER_TIMER_PERIOD      500          /**< Timer period (msec) */
-#if 0  
-    /* Start timer for LED1 blinking */
-    TimerHandle_t read_timer_handle; 
-    read_timer_handle =xTimerCreate( "led", BUZZER_TIMER_PERIOD, pdTRUE, NULL, Buzzer_Toggle_Timer_Callback);
-    xTimerStart(read_timer_handle, 0);
-#endif
-    TimerHandle_t timer_handle; 
-    timer_handle =TimerCreate(BUZZER_TIMER_PERIOD, Buzzer_Toggle_Timer_Callback);    
-}
+
 static void Led_Off_Timer_Callback (void * pvParameter)
 {
     LED1_OFF;LED2_OFF;LED3_OFF;LED4_OFF;LED5_OFF;
@@ -174,22 +139,19 @@ void MainControlTask(void * pvParameters)
     LED1_ON; LED2_ON; LED3_ON; LED4_ON; LED5_ON;
     TimerCreateOneshot(1000, Led_Off_Timer_Callback); 
      
-    LedFlash_StartPeriodicToggle();
-    //Buzzer_StartPeriodicBuzz();
+    //LedFlash_StartPeriodicToggle();
     
-    Lcd_SendString(LINE1, "BRETT");
-    Lcd_SendString(LINE2, "IS");
-    Lcd_SendString(LINE3, "A");
-    Lcd_SendString(LINE4, "BUTTTARD");
+    //Lcd_SendString(LINE1, "LCD");
+    //Lcd_SendString(LINE2, "TEST");
+    //Lcd_SendString(LINE3, "LINE3");
+    //Lcd_SendString(LINE4, "LINE4");
     
     for( ;; )
     {      
         KickWdt();         
               
-        //AdcMeasureReadings();
-
     #ifdef TERMINAL_ENABLED        
-        if( (++loopCnt %100) ==0 )
+        if( (++loopCnt %1000) ==0 )
         {
             memset(&aStr, 0x00,sizeof(aStr));
             sprintf(aStr, "count: %d\r\n", loopCnt);
