@@ -309,17 +309,29 @@ BOOL GetSwitchStatus
    UINT8 switchId
 )
 {
-   UINT32 switchMask;
+   UINT16 switchMask =0;
 
-   switchMask  =(GPIO_ReadInputDataBit(KEYPAD1_PORT, KEYPAD1_PIN)<<0);   
-   switchMask |=(GPIO_ReadInputDataBit(KEYPAD2_PORT, KEYPAD2_PIN)<<1);   
-   switchMask |=(GPIO_ReadInputDataBit(KEYPAD3_PORT, KEYPAD3_PIN)<<2);   
-   switchMask |=(GPIO_ReadInputDataBit(KEYPAD4_PORT, KEYPAD4_PIN)<<3);   
-   switchMask |=(GPIO_ReadInputDataBit(KEYPAD5_PORT, KEYPAD5_PIN)<<4);   
-   switchMask |=(GPIO_ReadInputDataBit(KEYPAD6_PORT, KEYPAD6_PIN)<<5);   
-   switchMask |=(GPIO_ReadInputDataBit(KEYPAD7_PORT, KEYPAD7_PIN)<<6);   
+   if( switchId <5)
+   {
+      GPIO_ResetBits(KEYPAD1_PORT, KEYPAD1_PIN);
+      GPIO_SetBits(KEYPAD2_PORT, KEYPAD2_PIN);
+   }
+   else
+   {
+      GPIO_ResetBits(KEYPAD2_PORT, KEYPAD2_PIN);
+      GPIO_SetBits(KEYPAD1_PORT, KEYPAD1_PIN);
+   }
+     
+   
+   switchMask |=(GPIO_ReadInputDataBit(KEYPAD3_PORT, KEYPAD3_PIN)<<0);   
+   switchMask |=(GPIO_ReadInputDataBit(KEYPAD4_PORT, KEYPAD4_PIN)<<1);   
+   switchMask |=(GPIO_ReadInputDataBit(KEYPAD5_PORT, KEYPAD5_PIN)<<2);   
+   switchMask |=(GPIO_ReadInputDataBit(KEYPAD6_PORT, KEYPAD6_PIN)<<3);   
+   switchMask |=(GPIO_ReadInputDataBit(KEYPAD7_PORT, KEYPAD7_PIN)<<4);   
    
    //switchMask =(switchMask <<switchId);
+   
+   switchId =(switchId%5);
    
    if( (switchMask & (0x01<<switchId) ) ==(0x01<<switchId) )
       return FALSE;

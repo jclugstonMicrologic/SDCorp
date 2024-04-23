@@ -85,17 +85,21 @@ void Gpio_Init
     
     GPIO_InitStructure.GPIO_Pin = PIEZO_BZR_PIN;
     GPIO_Init(PIEZO_BZR_PORT, &GPIO_InitStructure);   
-         
-    /* configure the following GPIO pins as inputs */
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
-    GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
-    GPIO_InitStructure.GPIO_PuPd =GPIO_PuPd_UP;// GPIO_PuPd_NOPULL;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_25MHz;  
     
     GPIO_InitStructure.GPIO_Pin = KEYPAD1_PIN;
     GPIO_Init(KEYPAD1_PORT, &GPIO_InitStructure);        
     GPIO_InitStructure.GPIO_Pin = KEYPAD2_PIN;
     GPIO_Init(KEYPAD2_PORT, &GPIO_InitStructure);    
+    
+    GPIO_SetBits(KEYPAD1_PORT, KEYPAD1_PIN);
+    GPIO_SetBits(KEYPAD2_PORT, KEYPAD2_PIN);
+      
+    /* configure the following GPIO pins as inputs */
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+    GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
+    GPIO_InitStructure.GPIO_PuPd =GPIO_PuPd_UP;//GPIO_PuPd_UP;// GPIO_PuPd_NOPULL;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_25MHz;  
+    
     GPIO_InitStructure.GPIO_Pin = KEYPAD3_PIN;
     GPIO_Init(KEYPAD3_PORT, &GPIO_InitStructure);    
     GPIO_InitStructure.GPIO_Pin = KEYPAD4_PIN;

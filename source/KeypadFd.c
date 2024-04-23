@@ -284,7 +284,7 @@ void SendKeyFwdJogMsg(void)
 
 void SendKeyRevLowMsg(void)
 {
-    char radioTxBuf[]={0x01,0x7f,0x01,0x03,0x10,0x81,0x81};
+    char radioTxBuf[]={0x01,0x7f,0x01,0x03,0x10,0xa6,0xa6};    
     uint8_t len =sizeof(radioTxBuf);
   
     SciSendDataPacket(SCI_RADIO_COM, radioTxBuf, len);
@@ -300,7 +300,7 @@ void SendKeyRevMedMsg(void)
 
 void SendKeyRevFastMsg(void)
 {
-    char radioTxBuf[]={0x01,0x7f,0x01,0x03,0x10,0xa6,0xa6};
+    char radioTxBuf[]={0x01,0x7f,0x01,0x03,0x10,0x81,0x81};
     uint8_t len =sizeof(radioTxBuf);
   
     SciSendDataPacket(SCI_RADIO_COM, radioTxBuf, len);
@@ -415,10 +415,12 @@ void KeypadMachine
 #endif         
    }
    
+   //KeypadInfo.keyCallback =SendKeyStopMsg;
+   //KeypadInfo.keyCallback();
    if( KeyActionRequest !=KEY_NONE )
    {
       /*!!!! TEST !!!!*/      
-      KeypadInfo.keyCallback =SendKeyStopMsg;
+      //KeypadInfo.keyCallback =SendKeyFwdLowMsg;
       
       BUZZER_ON;
       KeypadInfo.keyCallback();      

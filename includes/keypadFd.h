@@ -104,20 +104,20 @@ enum
 };
 
 enum
-{    
-   KEY_PWR_UP,
-   KEY_STOP,     
-   
-   KEY_FWD_LOW,
+{              
+   KEY_FWD_LOW =0,
    KEY_FWD_MED,      
    KEY_FWD_FAST,  
-   KEY_FWD_JOG,   
-   
+   KEY_FWD_JOG,
+   KEY_STOP,
+         
    KEY_REV_LOW,
    KEY_REV_MED,      
    KEY_REV_FAST,  
    KEY_REV_JOG,      
 
+   KEY_PWR_UP,
+   
    KEY_RELEASE_FWD_JOG,
    KEY_RELEASE_REV_JOG,
      

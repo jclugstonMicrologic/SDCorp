@@ -197,11 +197,8 @@ void Radio_ProcessCommands
             if( strstr(cmdArr,"PE") )
             {
                 LED6_OFF;
-            }       
-            if( strstr(cmdArr,"PK") )
-            {
-                LED3_ON;
-            }                   
+            }     
+            
             if( strstr(cmdArr,"PH") )
             {
                 LED1_ON;
@@ -210,6 +207,18 @@ void Radio_ProcessCommands
             {
                 LED2_ON;
             } 
+            if( strstr(cmdArr,"PL") )
+            {
+                LED3_ON;
+            }                                           
+            if( strstr(cmdArr,"PK") )
+            {
+                LED4_ON;
+            }                               
+            if( strstr(cmdArr,"PJ") )
+            {
+                LED5_ON;
+            }        
             if( strstr(cmdArr,"PI") )
             {
                 LED6_ON;

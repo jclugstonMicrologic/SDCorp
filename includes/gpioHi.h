@@ -34,16 +34,16 @@
 #define PIEZO_BZR_PIN   GPIO_Pin_12
 #define PIEZO_BZR_PORT  GPIOB
 
-#define LED6_PIN   GPIO_Pin_6
+#define LED6_PIN   GPIO_Pin_13
 #define LED6_PORT  GPIOC
-#define LED5_PIN   GPIO_Pin_7
+#define LED5_PIN   GPIO_Pin_9
 #define LED5_PORT  GPIOC
 #define LED4_PIN   GPIO_Pin_8
 #define LED4_PORT  GPIOC
-#define LED3_PIN   GPIO_Pin_9
+#define LED3_PIN   GPIO_Pin_7 //GPIO_Pin_9
 #define LED3_PORT  GPIOC
-#define LED2_PIN   GPIO_Pin_13
-#define LED2_PORT  GPIOC
+#define LED2_PIN   GPIO_Pin_6 //GPIO_Pin_13
+#define LED2_PORT  GPIOC //GPIOC
 #define LED1_PIN   GPIO_Pin_8
 #define LED1_PORT  GPIOA
 

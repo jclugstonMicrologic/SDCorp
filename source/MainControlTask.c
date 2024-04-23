@@ -104,7 +104,7 @@ void LedFlash_StartPeriodicToggle(void)
 
 static void Led_Off_Timer_Callback (void * pvParameter)
 {
-    LED1_OFF;LED2_OFF;LED3_OFF;LED4_OFF;LED5_OFF;
+    LED1_OFF;LED2_OFF;LED3_OFF;LED4_OFF;LED5_OFF;LED6_OFF;
 }
 
 /*
@@ -136,7 +136,7 @@ void MainControlTask(void * pvParameters)
      
     SciAsciiSendString(SCI_PC_COM, aStr);       
 #endif    
-    LED1_ON; LED2_ON; LED3_ON; LED4_ON; LED5_ON;
+    LED2_ON; LED3_ON; LED4_ON; LED5_ON; LED6_ON;
     TimerCreateOneshot(1000, Led_Off_Timer_Callback); 
      
     //LedFlash_StartPeriodicToggle();
