@@ -30,6 +30,8 @@ BOOL TimerSetupUs( void );
 void TimerDelayUs( UINT32 delayUL );
 TimerHandle_t TimerCreate( int32_t timeout, void (*pCallBack)() );
 TimerHandle_t TimerCreateOneshot( int32_t timeout, void (*pCallBack)() );
+
+BaseType_t TimerStop(TimerHandle_t timerHandle);
 #endif
 
 

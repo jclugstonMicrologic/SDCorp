@@ -103,6 +103,7 @@ UINT8 KeyActionRequest;
 *****************************************************************************
 */
 KEY_PAD_INFO KeypadInfo;
+TimerHandle_t BuzzerTimerHandle =NULL; 
 
 /*
 *****************************************************************************
@@ -337,8 +338,7 @@ void Buzzer_StartPeriodicBuzz(void)
 {
     #define BUZZER_TIMER_PERIOD      500          /**< Timer period (msec) */
 
-    TimerHandle_t timer_handle; 
-    timer_handle =TimerCreate(BUZZER_TIMER_PERIOD, Buzzer_Toggle_Timer_Callback);    
+    BuzzerTimerHandle =TimerCreate(BUZZER_TIMER_PERIOD, Buzzer_Toggle_Timer_Callback);    
 }
 
 static void Buzzer_Off_Timer_Callback (void * pvParameter)
@@ -384,27 +384,21 @@ void KeypadMachine
       case KEYPAD_MAIN_STATE:        
          switch( key_ )
          {
-            case KEY_PWR_UP: //key1
-                break;
-            case KEY_STOP:  //key6           
-                break;
-            case KEY_FWD_LOW: //key2
-                break;
-            case KEY_FWD_MED: //key3
-                break;
-            case KEY_FWD_FAST: //key4
-                break;    
-            case KEY_FWD_JOG: //key5
-                break;       
-            case KEY_RELEASE_FWD_JOG: //key5
+            case KEY_PWR_UP:
+            case KEY_STOP:  
+            case KEY_FWD_LOW: 
+            case KEY_FWD_MED: 
+            case KEY_FWD_FAST:
+            case KEY_FWD_JOG: 
+            case KEY_RELEASE_FWD_JOG:
+                //TimerStop(BuzzerTimerHandle);
                 break;        
             case KEY_REV_LOW:
             case KEY_REV_MED:
             case KEY_REV_FAST:
             case KEY_REV_JOG:
+            case KEY_RELEASE_REV_JOG:
                 //Buzzer_StartPeriodicBuzz();
-                break;
-            case KEY_RELEASE_REV_JOG: //
                 break;                  
          }
          break;
@@ -419,12 +413,13 @@ void KeypadMachine
    //KeypadInfo.keyCallback();
    if( KeyActionRequest !=KEY_NONE )
    {
-      /*!!!! TEST !!!!*/      
-      //KeypadInfo.keyCallback =SendKeyFwdLowMsg;
-      
       BUZZER_ON;
       KeypadInfo.keyCallback();      
       TimerCreateOneshot(BUZZER_KEY_ON_TIME, Buzzer_Off_Timer_Callback); 
+      
+      //char aStr[32];
+      //sprintf(aStr, "Key: %d\r\n", KeyActionRequest);
+      //SciAsciiSendString(SCI_PC_COM, aStr);    
    }
    
    KeyActionRequest =KEY_NONE;
@@ -558,6 +553,21 @@ void KeyReleaseRevJog
 */
 void KeyRunState(int key_)
 {
+}
+
+void SetBuzzerState(uint8_t direction)
+{
+    if( direction ==0 )       
+    {
+        if( BuzzerTimerHandle ==NULL )
+            Buzzer_StartPeriodicBuzz();
+    }
+    else
+    {
+        TimerStop(BuzzerTimerHandle);
+        
+        BuzzerTimerHandle =NULL;
+    }  
 }
 
 #if 0

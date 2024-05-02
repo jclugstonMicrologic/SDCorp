@@ -20,7 +20,7 @@
 
 #include "types.h"
 
-#define TCE_FW_VERSION "0.0.0.0 " 
+#define TCE_FW_VERSION "0.0.0.1 "   // A major,B minor,C patch,D revision
 
 
 BOOL MainControlTaskInit(void);

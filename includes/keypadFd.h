@@ -95,6 +95,8 @@ void KeyRevJog(void);
 void KeyReleaseFwdJog(void);
 void KeyReleaseRevJog(void);
 
+void SetBuzzerState(uint8_t state);
+
 enum
 {
    CONTACT_ID =0,

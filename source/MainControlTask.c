@@ -95,10 +95,10 @@ void LedFlash_StartPeriodicToggle(void)
 {
     #define TIMER_PERIOD      200          /**< Timer period (msec) */  
 
-    TimerHandle_t timer_handle; 
-    timer_handle =TimerCreate(TIMER_PERIOD, Led_Toggle_Timer_Callback);
+    //TimerHandle_t timer_handle; 
+    //timer_handle =TimerCreate(TIMER_PERIOD, Led_Toggle_Timer_Callback);
     
-    //xTimerStop(timer_handle, 0);
+    TimerCreate(TIMER_PERIOD, Led_Toggle_Timer_Callback);
 }
 
 
@@ -138,9 +138,7 @@ void MainControlTask(void * pvParameters)
 #endif    
     LED2_ON; LED3_ON; LED4_ON; LED5_ON; LED6_ON;
     TimerCreateOneshot(1000, Led_Off_Timer_Callback); 
-     
-    //LedFlash_StartPeriodicToggle();
-    
+        
     //Lcd_SendString(LINE1, "LCD");
     //Lcd_SendString(LINE2, "TEST");
     //Lcd_SendString(LINE3, "LINE3");

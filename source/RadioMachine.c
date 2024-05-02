@@ -32,6 +32,7 @@
 #include "gpioHi.h"
 #include "LcdFd.h"
 #include "RadioMachine.h"
+#include "KeypadFd.h"
 
 #include "sysTimers.h"
 
@@ -152,6 +153,8 @@ void Radio_ProcessCommands
     int j=0, k=0;
     char abyte =0x1b;
     char cmdArr[32];
+    uint8_t direction =1;
+    
     while(j<nbrbytes)
     {
         //abyte =*pRxBuf;
@@ -218,16 +221,19 @@ void Radio_ProcessCommands
             if( strstr(cmdArr,"PJ") )
             {
                 LED5_ON;
+                direction =0;
             }        
             if( strstr(cmdArr,"PI") )
             {
-                LED6_ON;
+                LED6_ON;                
+                direction =0;
             }             
             
             k=0;
         }       
     }
     
+    SetBuzzerState(direction);
     /* send a packet */
     //SciSendPacket(SCI_RADIO_COM, cmd, 5, RadioSerialTxBuffer);     
 }

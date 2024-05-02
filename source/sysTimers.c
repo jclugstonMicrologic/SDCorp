@@ -136,3 +136,13 @@ TimerHandle_t TimerCreateOneshot( int32_t timeout, void (*pCallBack)() )
 }
 
 
+BaseType_t TimerStop(TimerHandle_t timerHandle)
+{   
+    if(timerHandle !=NULL)
+    {
+        return xTimerStop(timerHandle,0);;     
+    }
+    else
+        return 0;
+}
+
