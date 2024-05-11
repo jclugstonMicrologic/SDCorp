@@ -564,8 +564,11 @@ void SetBuzzerState(uint8_t direction)
     }
     else
     {
+        /* may be better to check if buzzer is off, then stop the timer, 
+           it might sound better 
+        */
         TimerStop(BuzzerTimerHandle);
-        
+        BUZZER_OFF;
         BuzzerTimerHandle =NULL;
     }  
 }

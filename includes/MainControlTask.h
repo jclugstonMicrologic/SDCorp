@@ -11,7 +11,7 @@
 * REVISION LOG
 *
 *******************************************************************************
-* Copyright (c) 2021, MICROLOGIC
+* Copyright (c) 2024, MICROLOGIC
 * Calgary, Alberta, Canada, www.transrailinnovation.ca
 *******************************************************************************/
 
@@ -20,7 +20,7 @@
 
 #include "types.h"
 
-#define TCE_FW_VERSION "0.0.0.1 "   // A major,B minor,C patch,D revision
+#define TCE_FW_VERSION "0.0.0.2 "   // A major,B minor,C patch,D revision
 
 
 BOOL MainControlTaskInit(void);
