@@ -98,14 +98,6 @@ void KeyReleaseRevJog(void);
 void SetBuzzerState(uint8_t state);
 
 enum
-{
-   CONTACT_ID =0,
-   KEYBOARD,
-   FEEDBACK
-
-};
-
-enum
 {              
    KEY_FWD_LOW =0,
    KEY_FWD_MED,      

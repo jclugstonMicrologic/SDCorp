@@ -328,9 +328,7 @@ BOOL GetSwitchStatus
    switchMask |=(GPIO_ReadInputDataBit(KEYPAD5_PORT, KEYPAD5_PIN)<<2);   
    switchMask |=(GPIO_ReadInputDataBit(KEYPAD6_PORT, KEYPAD6_PIN)<<3);   
    switchMask |=(GPIO_ReadInputDataBit(KEYPAD7_PORT, KEYPAD7_PIN)<<4);   
-   
-   //switchMask =(switchMask <<switchId);
-   
+        
    switchId =(switchId%5);
    
    if( (switchMask & (0x01<<switchId) ) ==(0x01<<switchId) )

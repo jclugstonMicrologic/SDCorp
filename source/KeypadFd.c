@@ -42,9 +42,7 @@
 
 #define NBR_KEYPAD_SWITCHES (16)
 
-#define KEYPAD_UP_BIT_MASK   (0x01)
-#define KEYPAD_DOWN_BIT_MASK (0x02)
-#define KEYPAD_DUAL_ACK      (0x04)
+#define BUZZER_KEY_ON_TIME (150)
 
 #pragma segment="BOOTLOADEREND"
 #define APP_START_ADDRESS ((void *)0x00020000)
@@ -346,7 +344,6 @@ static void Buzzer_Off_Timer_Callback (void * pvParameter)
     BUZZER_OFF;
 }
 
-#define BUZZER_KEY_ON_TIME (150)
 /*
 *|----------------------------------------------------------------------------
 *|  Module: KeypadFd Module
@@ -544,23 +541,16 @@ void KeyReleaseRevJog
    KeyActionRequest =KEY_RELEASE_REV_JOG;
    KeypadInfo.keyCallback =SendKeyStopMsg;
 } // end
-/*
-*|----------------------------------------------------------------------------
-*|  Module: KeypadFd Module
-*|  Routine: KeyRunState
-*|  Description:
-*|----------------------------------------------------------------------------
-*/
-void KeyRunState(int key_)
-{
-}
+
 
 void SetBuzzerState(uint8_t direction)
 {
     if( direction ==0 )       
     {
         if( BuzzerTimerHandle ==NULL )
+        {
             Buzzer_StartPeriodicBuzz();
+        }
     }
     else
     {
@@ -573,52 +563,6 @@ void SetBuzzerState(uint8_t direction)
     }  
 }
 
-#if 0
-/*
-*|----------------------------------------------------------------------------
-*|  Module: KeypadFd Module
-*|  Routine: KeySetupState
-*|  Description:
-*|----------------------------------------------------------------------------
-*/
-void KeySetupState(int key_)
-{
-   switch( key_ )        
-   {
-      case KEY_LEFT:
-         // go back
-         MainDisplay();         
-         break;
-      case KEY_UP:
-      case KEY_HELD_UP:                
-         if( ++BallCount.load >MAX_BALL_COUNT )
-         {
-            BallCount.load =MAX_BALL_COUNT;                 
-         }
-         
-         BallCount.index =0;
-         MotorControl.indexState =INDEX_COMPLETE_STATE;
-         break;
-      case KEY_DOWN:
-      case KEY_HELD_DOWN:              
-         if( --BallCount.load<0 )// ==255 )
-         {
-            BallCount.load =0;                
-         }        
-         break;
-      case KEY_ENTER:
-         // go to cannister screen
-         KeypadInfo.currentState =KEYPAD_SETUP_CANNISTER_STATE;
-         LcdMachineState =LCD_SETUP_CANNISTER_SCREEN;          
-         break;    
-      case KEY_UPDATE_SCREEN:       
-         // update LCD values
-         LcdMachineState =LCD_SETUP_UPDATE_SCREEN;         
-         break;                
-   }
-}
-
-#endif
 
 // end KeypadFd.c
 
