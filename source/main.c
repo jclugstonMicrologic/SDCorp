@@ -10,10 +10,17 @@
 *
 * REVISION LOG
 *
-*******************************************************************************
-* Copyright (c) 2024, MICROLOGIC
-* Calgary, Alberta, Canada, www.micrologic.ab.ca
 *******************************************************************************/
+/*
+   ***************************************************************************
+   Copyright (C) 2024, Micrologic Limited.
+   Any information contained in this document which was hitherto unknown by
+   the recipient or in which there subsists a proprietary right must not be
+   disclosed to any other person, nor used for manufacturing purposes,
+   without the permission of Micrologic Limited and the acceptance of this
+   document will be construed as acceptance of the foregoing.
+   ***************************************************************************
+*/
 
 
 /* Kernel includes. */
@@ -69,40 +76,7 @@ void vTimerCallback( TimerHandle_t xTimer )
 //    GREEN_LED_TOGGLE;   
 #endif    
 
-    TickType_t xTicks=xTaskGetTickCount();
-   
-#if 0   
-    UINT8 rssi;
-    
-    rssi =IridiumGetRssi();
-
-    RED_LED_OFF;
-    BLUE_LED_OFF;            
-    GREEN_LED_OFF;
-    
-    switch(rssi)
-    {
-        case 0:
-            break;
-        case 1:
-            RED_LED_ON;
-            break;            
-        case 2:
-            BLUE_LED_ON;
-            break;   
-        case 3:
-            RED_LED_ON;
-            BLUE_LED_ON;
-            break;   
-        case 4:
-            GREEN_LED_ON;
-            break;   
-        case 5:
-            RED_LED_ON;
-            GREEN_LED_ON;            
-            break;                      
-    }
-#endif    
+    TickType_t xTicks=xTaskGetTickCount();  
 }
 
 
@@ -122,15 +96,6 @@ int main(void)
         return FALSE;
     }
 
-#if 0    
-    /* initialize a periodic timer for testing */    
-    if( TimerCreate(250, vTimerCallback) ==NULL_PTR )
-    {
-        //!!!
-        return FALSE;
-    }
-#endif
-    
     /* initialize the amc tasks, modules, state machines, etc */
     if( !TceTasksInit() )
     {
@@ -183,14 +148,7 @@ BOOL TargetHardwareInit(void)
     
     /* initialize all GPIO */
     Gpio_Init();
-          
-    //Pwm_Init();
-     
-    /* initialize internal RTC */
-    //RtcInit();
-    
-    //RtcInit();       
-
+                
     Lcd_Init();
     
     Keypad_Init();
@@ -230,16 +188,6 @@ BOOL TceTasksInit(void)
                  
     /* initialize the main control task */
     MainControlTaskInit();  
-
-    /* start serial receiver task for proprietary serial comms (PC GUI) */
-    //SciBinaryStartReceiver();
-    
-    /* start serial receiver task for ASCII serial comms (Bluetooth) */
-    //SciAsciiStartReceiver();
-    
-    /* Otherwise enters DFU mode to allow user programming his application */
-    /* Init Device Library */
-    //USBD_Init(&USBD_Device, &DFU_Desc, 0);
      
     return TRUE;
 }

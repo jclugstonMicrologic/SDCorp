@@ -94,9 +94,6 @@ static void Led_Toggle_Timer_Callback (void * pvParameter)
 void LedFlash_StartPeriodicToggle(void)
 {
     #define TIMER_PERIOD      200          /**< Timer period (msec) */  
-
-    //TimerHandle_t timer_handle; 
-    //timer_handle =TimerCreate(TIMER_PERIOD, Led_Toggle_Timer_Callback);
     
     TimerCreate(TIMER_PERIOD, Led_Toggle_Timer_Callback);
 }
@@ -125,8 +122,7 @@ void MainControlTask(void * pvParameters)
     UINT32 loopCnt =0;
     char aStr[32];
 
-    SciAsciiReceiverInit(SCI_PC_COM, SCI_PC_BAUD_RATE, NULL_PTR, NULL_PTR);
-    //TickType_t delayTime = xTaskGetTickCount();    
+    SciAsciiReceiverInit(SCI_PC_COM, SCI_PC_BAUD_RATE, NULL_PTR, NULL_PTR);    
    
     /* !!! test !!! */
     strcpy(aStr, "TCE v");
@@ -138,12 +134,7 @@ void MainControlTask(void * pvParameters)
 #endif    
     LED2_ON; LED3_ON; LED4_ON; LED5_ON; LED6_ON;
     TimerCreateOneshot(1000, Led_Off_Timer_Callback); 
-        
-    //Lcd_SendString(LINE1, "LCD");
-    //Lcd_SendString(LINE2, "TEST");
-    //Lcd_SendString(LINE3, "LINE3");
-    //Lcd_SendString(LINE4, "LINE4");
-    
+            
     for( ;; )
     {      
         KickWdt();         

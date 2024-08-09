@@ -156,9 +156,7 @@ void Radio_ProcessCommands
     uint8_t direction =1;
     
     while(j<nbrbytes)
-    {
-        //abyte =*pRxBuf;
-        
+    {       
         if( abyte ==0x1b )
         {
             abyte =*pRxBuf ++;

@@ -1,6 +1,6 @@
 /** C Source ******************************************************************
 *
-* NAME      timer.c
+* NAME      sysTimer.c
 *
 * SUMMARY   
 *
@@ -11,7 +11,7 @@
 * REVISION LOG
 *
 *******************************************************************************
-* Copyright (c) 2017, TRIG
+* Copyright (c) 2020, MICROLOGIC
 * Calgary, Alberta, Canada, www.webpage.ca
 *******************************************************************************/
 
@@ -19,9 +19,6 @@
 /** Include Files *************************************************************/
 
 #include "sysTimers.h"
-
-//#include "FreeRTOS.h"
-//#include "timers.h"
 
 
 #define GENERIC_TIMER      TIM5

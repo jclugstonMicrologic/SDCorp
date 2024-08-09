@@ -11,7 +11,7 @@
 * REVISION LOG
 *
 *******************************************************************************
-* Copyright (c) 2017, TRIG
+* Copyright (c) 2020, MICROLOGIC
 * Calgary, Alberta, Canada, www.webpage.ca
 *******************************************************************************/
 
@@ -63,7 +63,6 @@ BOOL SciCheckTimeout
 void SciStateProcess
 (
     COMMON *pCommonData,
-    //UINT8 prevState,
     UINT8 nextState
 )
 {

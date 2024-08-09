@@ -149,17 +149,13 @@ void SwitchMachine
    switch( SwitchData[id].machineState )
    {
          case SWITCH_IDLE_STATE:
-//            if (!SWITCH_ASSERTED(id) )
-//            {
             SwitchData[id].machineState = NORMAL_NEGATED_STATE;
-//            }
             break;
          case NORMAL_NEGATED_STATE:
             /* switch is negated */
             if( SWITCH_ASSERTED(id) )
             {
                /* switch looks asserted, start debounce counter */
-//               SwitchData[id].bounce = 0;
                SwitchData[id].bounce =xTicks;
                SwitchData[id].machineState = DEBOUNCE_ASSERTING_STATE;
             }
@@ -230,7 +226,6 @@ void SwitchMachine
                SwitchData[id].bounce = 0;
                SwitchData[id].machineState = DEBOUNCE_RELEASING_HELD_STATE;
             }
-//            else if( ++SwitchData[id].start % REPEAT_COUNTS == 0)
             else if( (xTicks-SwitchData[id].start) >250 )
             {
                /* invoke callback periodically since switch held asserted */
